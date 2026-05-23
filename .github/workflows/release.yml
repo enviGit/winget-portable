@@ -6,19 +6,11 @@ on:
 jobs:
   build_release:
     runs-on: windows-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Check branch
-        run: |
-          $branches = git branch -r --contains ${{ github.sha }}
-          if ($branches -notmatch "origin/main") {
-            Write-Error "Wrong branch. Terminating."
-            exit 1
-          }
 
       - name: Install Node
         uses: actions/setup-node@v4
@@ -31,15 +23,16 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build and release
-        uses: tauri-apps/tauri-action@v0
+      - name: Build portable executable
+        run: npx tauri build --no-bundle
+
+      - name: Publish Release
+        uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: app-v__VERSION__
-          releaseName: "Winget v__VERSION__"
-          releaseBody: "Automatic portable version."
-          releaseDraft: false
+          files: src-tauri/target/release/winget-portable.exe
+          name: "Winget ${{ github.ref_name }}"
+          body: "Automatic portable version."
+          draft: false
           prerelease: false
-          includeBundle: false
-          includeRelease: true
