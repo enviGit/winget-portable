@@ -13,20 +13,37 @@ const CREATE_NO_WINDOW: u32 = 0x08000000;
 fn scan_updates() -> String {
     #[cfg(target_os = "windows")]
     {
-        let output = std::process::Command::new("winget")
-            .args(["upgrade", "--accept-source-agreements"])
+        let output = std::process::Command::new("cmd")
+            .args([
+                "/C",
+                "chcp",
+                "65001",
+                ">nul",
+                "&",
+                "winget",
+                "upgrade",
+                "--accept-source-agreements",
+            ])
+            .env("WINGET_DISABLE_INTERACTIVITY", "1")
             .creation_flags(CREATE_NO_WINDOW)
             .output();
 
         match output {
-            Ok(result) => String::from_utf8_lossy(&result.stdout).to_string(),
+            Ok(result) => {
+                let text = String::from_utf8_lossy(&result.stdout).to_string();
+                if text.trim().is_empty() {
+                    String::from_utf8_lossy(&result.stderr).to_string()
+                } else {
+                    text
+                }
+            }
             Err(e) => e.to_string(),
         }
     }
 
     #[cfg(not(target_os = "windows"))]
     {
-        "Name Id Version Available Source\n---------------------------------------------------------\nDiscord Discord.Discord 1.0.0 1.2.0 winget\nSpotify Spotify.Spotify 2.1.0 3.0.0 winget".to_string()
+        "Name                                     Id               Version          Available      Source\n------------------------------------------------------------------------------------------------------\nDiscord                                  Discord.Discord  1.0.0            1.2.0          winget\nSpotify                                  Spotify.Spotify  2.1.0            3.0.0          winget".to_string()
     }
 }
 
@@ -35,7 +52,7 @@ fn scan_updates() -> String {
 fn update_app(id: String, auto_accept: bool) -> String {
     #[cfg(target_os = "windows")]
     {
-        let mut args = vec!["upgrade"];
+        let mut args = vec!["/C", "chcp", "65001", ">nul", "&", "winget", "upgrade"];
 
         if id != "ALL" {
             args.push("--id");
@@ -51,13 +68,21 @@ fn update_app(id: String, auto_accept: bool) -> String {
             args.push("--silent");
         }
 
-        let output = std::process::Command::new("winget")
+        let output = std::process::Command::new("cmd")
             .args(args)
+            .env("WINGET_DISABLE_INTERACTIVITY", "1")
             .creation_flags(CREATE_NO_WINDOW)
             .output();
 
         match output {
-            Ok(result) => String::from_utf8_lossy(&result.stdout).to_string(),
+            Ok(result) => {
+                let text = String::from_utf8_lossy(&result.stdout).to_string();
+                if text.trim().is_empty() {
+                    String::from_utf8_lossy(&result.stderr).to_string()
+                } else {
+                    text
+                }
+            }
             Err(e) => e.to_string(),
         }
     }
