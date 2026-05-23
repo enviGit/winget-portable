@@ -3,12 +3,19 @@
     windows_subsystem = "windows"
 )]
 
+#[cfg(target_os = "windows")]
+use std::os::windows::process::CommandExt;
+
+#[cfg(target_os = "windows")]
+const CREATE_NO_WINDOW: u32 = 0x08000000;
+
 #[tauri::command]
 fn scan_updates() -> String {
     #[cfg(target_os = "windows")]
     {
         let output = std::process::Command::new("winget")
-            .args(["upgrade"])
+            .args(["upgrade", "--accept-source-agreements"])
+            .creation_flags(CREATE_NO_WINDOW)
             .output();
 
         match output {
@@ -44,7 +51,10 @@ fn update_app(id: String, auto_accept: bool) -> String {
             args.push("--silent");
         }
 
-        let output = std::process::Command::new("winget").args(args).output();
+        let output = std::process::Command::new("winget")
+            .args(args)
+            .creation_flags(CREATE_NO_WINDOW)
+            .output();
 
         match output {
             Ok(result) => String::from_utf8_lossy(&result.stdout).to_string(),
@@ -64,6 +74,7 @@ fn open_link(url: String) {
     {
         let _ = std::process::Command::new("cmd")
             .args(["/C", "start", &url])
+            .creation_flags(CREATE_NO_WINDOW)
             .spawn();
     }
     #[cfg(not(target_os = "windows"))]
