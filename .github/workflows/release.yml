@@ -4,11 +4,21 @@ on:
     tags:
       - "v*"
 jobs:
-  build-and-release:
+  build_release:
     runs-on: windows-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check branch
+        run: |
+          $branches = git branch -r --contains ${{ github.sha }}
+          if ($branches -notmatch "origin/main") {
+            Write-Error "Wrong branch. Terminating."
+            exit 1
+          }
 
       - name: Install Node
         uses: actions/setup-node@v4
@@ -31,3 +41,5 @@ jobs:
           releaseBody: "Automatic portable version."
           releaseDraft: false
           prerelease: false
+          includeBundle: false
+          includeRelease: true
