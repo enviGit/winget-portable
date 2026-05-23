@@ -1,0 +1,66 @@
+#![cfg_attr(
+    all(not(debug_assertions), target_os = "windows"),
+    windows_subsystem = "windows"
+)]
+
+#[tauri::command]
+fn scan_updates() -> String {
+    #[cfg(target_os = "windows")]
+    {
+        let output = std::process::Command::new("winget")
+            .args(["upgrade"])
+            .output();
+
+        match output {
+            Ok(result) => String::from_utf8_lossy(&result.stdout).to_string(),
+            Err(e) => e.to_string(),
+        }
+    }
+
+    #[cfg(not(target_os = "windows"))]
+    {
+        "Name Id Version Available Source\n---------------------------------------------------------\nDiscord Discord.Discord 1.0.0 1.2.0 winget\nSpotify Spotify.Spotify 2.1.0 3.0.0 winget".to_string()
+    }
+}
+
+#[tauri::command]
+#[allow(unused_variables)]
+fn update_app(id: String, auto_accept: bool) -> String {
+    #[cfg(target_os = "windows")]
+    {
+        let mut args = vec!["upgrade"];
+
+        if id != "ALL" {
+            args.push("--id");
+            args.push(&id);
+            args.push("--exact");
+        } else {
+            args.push("--all");
+        }
+
+        if auto_accept {
+            args.push("--accept-source-agreements");
+            args.push("--accept-package-agreements");
+            args.push("--silent");
+        }
+
+        let output = std::process::Command::new("winget").args(args).output();
+
+        match output {
+            Ok(result) => String::from_utf8_lossy(&result.stdout).to_string(),
+            Err(e) => e.to_string(),
+        }
+    }
+
+    #[cfg(not(target_os = "windows"))]
+    {
+        format!("Mac OS simulation: Successfully updated {}.", id)
+    }
+}
+
+fn main() {
+    tauri::Builder::default()
+        .invoke_handler(tauri::generate_handler![scan_updates, update_app])
+        .run(tauri::generate_context!())
+        .expect("Failed to run app");
+}

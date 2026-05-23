@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Winget Portable</title>
+        <link rel="stylesheet" href="styles.css" />
+    </head>
+    <body>
+        <div class="top-bar">
+            <select id="langSelect">
+                <option value="en">English</option>
+                <option value="pl">Polski</option>
+            </select>
+        </div>
+
+        <div class="container">
+            <h1 data-i18n="title">Update Apps</h1>
+            <p data-i18n="description">
+                This tool will fetch and install the latest versions of your
+                installed software.
+            </p>
+
+            <div class="actions">
+                <button id="scanBtn" data-i18n="scanBtn">
+                    Scan for updates
+                </button>
+                <label class="checkbox-container">
+                    <input type="checkbox" id="autoAccept" checked />
+                    <span data-i18n="autoAccept"
+                        >Automatically accept all agreements</span
+                    >
+                </label>
+            </div>
+
+            <div id="tableContainer" class="hidden">
+                <div class="table-wrapper">
+                    <table id="appsTable">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <input
+                                        type="checkbox"
+                                        id="selectAll"
+                                        checked
+                                    />
+                                </th>
+                                <th data-i18n="colName">Name</th>
+                                <th data-i18n="colCurrent">Current</th>
+                                <th data-i18n="colNew">New</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+                <button id="updateSelectedBtn" data-i18n="updateSelectedBtn">
+                    Update Selected
+                </button>
+            </div>
+
+            <pre id="output" data-state="ready" data-i18n="ready">
+Ready to go...</pre
+            >
+        </div>
+        <script type="module" src="main.js"></script>
+    </body>
+</html>
