@@ -9,6 +9,12 @@ use std::os::windows::process::CommandExt;
 #[cfg(target_os = "windows")]
 const CREATE_NO_WINDOW: u32 = 0x08000000;
 
+#[derive(serde::Serialize)]
+struct CommandResponse {
+    success: bool,
+    text: String,
+}
+
 #[tauri::command]
 fn scan_updates() -> String {
     #[cfg(target_os = "windows")]
@@ -49,7 +55,7 @@ fn scan_updates() -> String {
 
 #[tauri::command]
 #[allow(unused_variables)]
-fn update_app(id: String, auto_accept: bool) -> String {
+fn update_app(id: String, auto_accept: bool) -> CommandResponse {
     #[cfg(target_os = "windows")]
     {
         let mut args = vec!["/C", "chcp", "65001", ">nul", "&", "winget", "upgrade"];
@@ -76,20 +82,28 @@ fn update_app(id: String, auto_accept: bool) -> String {
 
         match output {
             Ok(result) => {
-                let text = String::from_utf8_lossy(&result.stdout).to_string();
+                let mut text = String::from_utf8_lossy(&result.stdout).to_string();
                 if text.trim().is_empty() {
-                    String::from_utf8_lossy(&result.stderr).to_string()
-                } else {
-                    text
+                    text = String::from_utf8_lossy(&result.stderr).to_string();
                 }
-            }
-            Err(e) => e.to_string(),
+                CommandResponse {
+                    success: result.status.success(),
+                    text,
+                }
+            },
+            Err(e) => CommandResponse {
+                success: false,
+                text: e.to_string(),
+            },
         }
     }
 
     #[cfg(not(target_os = "windows"))]
     {
-        format!("Mac OS simulation: Successfully updated {}.", id)
+        CommandResponse {
+            success: true,
+            text: format!("Mac OS simulation: Successfully updated {}.", id),
+        }
     }
 }
 

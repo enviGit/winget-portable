@@ -282,6 +282,13 @@ td {
     border-bottom: 1px solid var(--border-color);
 }
 
+td {
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 tr {
     animation: slideIn 0.3s ease forwards;
     opacity: 0;
