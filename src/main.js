@@ -1,4 +1,6 @@
 const { invoke } = window.__TAURI__.core;
+const { getCurrentWindow } = window.__TAURI__.window;
+const { getVersion } = window.__TAURI__.app;
 
 const translations = {
   en: {
@@ -254,8 +256,10 @@ themeToggleBtn.addEventListener("click", () => {
 
   if (currentTheme === "light") {
     htmlEl.setAttribute("data-theme", "dark");
+    getCurrentWindow().setTheme("dark");
   } else {
     htmlEl.setAttribute("data-theme", "light");
+    getCurrentWindow().setTheme("light");
   }
 
   setTimeout(() => {
@@ -265,6 +269,21 @@ themeToggleBtn.addEventListener("click", () => {
 });
 
 let newUpdateUrl = null;
+
+function isNewerVersion(remote, local) {
+  const v1 = remote.split(".").map(Number);
+  const v2 = local.split(".").map(Number);
+
+  for (let i = 0; i < Math.max(v1.length, v2.length); i++) {
+    const num1 = v1[i] || 0;
+    const num2 = v2[i] || 0;
+
+    if (num1 > num2) return true;
+    if (num1 < num2) return false;
+  }
+
+  return false;
+}
 
 async function checkAppUpdates(silent = false) {
   if (!silent) {
@@ -279,10 +298,18 @@ async function checkAppUpdates(silent = false) {
     const response = await fetch(
       "https://api.github.com/repos/enviGit/winget-portable/releases/latest",
     );
-    const data = await response.json();
-    const currentVersion = "v1.0.0";
 
-    if (data.tag_name && data.tag_name !== currentVersion) {
+    if (!response.ok) {
+      throw new Error(
+        `GitHub API error: ${response.status} ${response.statusText}`,
+      );
+    }
+
+    const data = await response.json();
+    const currentVersion = await getVersion();
+    const tagVersion = data.tag_name ? data.tag_name.replace("v", "") : "";
+
+    if (data.tag_name && isNewerVersion(tagVersion, currentVersion)) {
       newUpdateUrl = data.html_url;
 
       appUpdateStatus.setAttribute("data-state", "updateAvailable");
@@ -306,6 +333,7 @@ async function checkAppUpdates(silent = false) {
       ).upToDate;
     }
   } catch (err) {
+    console.error("Update error details:", err);
     if (!silent) {
       appUpdateStatus.setAttribute("data-state", "error");
       appUpdateStatus.textContent = (
@@ -333,7 +361,7 @@ function parseWingetOutput(text) {
   let isTable = false;
 
   for (let line of lines) {
-    if (line.includes("---")) {
+    if (line.match(/^[-—]{3,}/)) {
       isTable = true;
       continue;
     }
@@ -347,6 +375,8 @@ function parseWingetOutput(text) {
         oldVer: parts[2].trim(),
         newVer: parts[3].trim(),
       });
+    } else {
+      isTable = false;
     }
   }
   return apps;
