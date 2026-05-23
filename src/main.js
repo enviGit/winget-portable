@@ -1,3 +1,5 @@
+const { invoke } = window.__TAURI__.core;
+
 const translations = {
   en: {
     title: "Update Apps",
@@ -48,6 +50,106 @@ const translations = {
     checking: "Sprawdzam...",
     updateAvailable: "Dostępna nowa wersja!",
     upToDate: "Posiadasz najnowszą wersję.",
+  },
+  es: {
+    title: "Actualizar Apps",
+    description:
+      "Esta herramienta descargará e instalará las últimas versiones de su software.",
+    scanBtn: "Buscar actualizaciones",
+    autoAccept: "Aceptar acuerdos automáticamente",
+    startupCheck: "Buscar actualizaciones al inicio",
+    updateSelectedBtn: "Actualizar seleccionados",
+    colName: "Nombre",
+    colCurrent: "Actual",
+    colNew: "Nuevo",
+    ready: "Listo para empezar...",
+    scanning: "Buscando actualizaciones...",
+    updating: "Actualizando aplicaciones...",
+    noUpdates: "No se encontraron actualizaciones.",
+    error: "Error: \n",
+    settingsTitle: "Ajustes",
+    themeBtn: "Cambiar tema",
+    closeBtn: "Cerrar",
+    checkAppUpdate: "Buscar actualizaciones de la app",
+    downloadUpdate: "Descargar actualización",
+    checking: "Buscando...",
+    updateAvailable: "¡Nueva versión disponible!",
+    upToDate: "Tienes la última versión.",
+  },
+  de: {
+    title: "Apps Aktualisieren",
+    description:
+      "Dieses Tool lädt die neuesten Versionen Ihrer Software herunter.",
+    scanBtn: "Nach Updates suchen",
+    autoAccept: "Vereinbarungen automatisch akzeptieren",
+    startupCheck: "Beim Start nach Updates suchen",
+    updateSelectedBtn: "Ausgewählte aktualisieren",
+    colName: "Name",
+    colCurrent: "Aktuell",
+    colNew: "Neu",
+    ready: "Bereit...",
+    scanning: "System wird überprüft...",
+    updating: "Ausgewählte Apps werden aktualisiert...",
+    noUpdates: "Keine Updates gefunden.",
+    error: "Fehler: \n",
+    settingsTitle: "Einstellungen",
+    themeBtn: "Design ändern",
+    closeBtn: "Schließen",
+    checkAppUpdate: "Nach App-Updates suchen",
+    downloadUpdate: "Update herunterladen",
+    checking: "Wird überprüft...",
+    updateAvailable: "Neue Version verfügbar!",
+    upToDate: "Sie haben die neueste Version.",
+  },
+  fr: {
+    title: "Mettre à jour",
+    description:
+      "Cet outil téléchargera et installera les dernières versions de vos logiciels.",
+    scanBtn: "Rechercher des mises à jour",
+    autoAccept: "Accepter automatiquement les accords",
+    startupCheck: "Vérifier les mises à jour au démarrage",
+    updateSelectedBtn: "Mettre à jour la sélection",
+    colName: "Nom",
+    colCurrent: "Actuel",
+    colNew: "Nouveau",
+    ready: "Prêt...",
+    scanning: "Recherche de mises à jour...",
+    updating: "Mise à jour des applications...",
+    noUpdates: "Aucune mise à jour trouvée.",
+    error: "Erreur: \n",
+    settingsTitle: "Paramètres",
+    themeBtn: "Changer de thème",
+    closeBtn: "Fermer",
+    checkAppUpdate: "Vérifier les mises à jour de l'app",
+    downloadUpdate: "Télécharger la mise à jour",
+    checking: "Vérification...",
+    updateAvailable: "Nouvelle version disponible!",
+    upToDate: "Vous avez la dernière version.",
+  },
+  it: {
+    title: "Aggiorna App",
+    description:
+      "Questo strumento scaricherà e installerà le ultime versioni del tuo software.",
+    scanBtn: "Cerca aggiornamenti",
+    autoAccept: "Accetta automaticamente gli accordi",
+    startupCheck: "Cerca aggiornamenti all'avvio",
+    updateSelectedBtn: "Aggiorna selezionati",
+    colName: "Nome",
+    colCurrent: "Attuale",
+    colNew: "Nuovo",
+    ready: "Pronto...",
+    scanning: "Ricerca aggiornamenti...",
+    updating: "Aggiornamento in corso...",
+    noUpdates: "Nessun aggiornamento trovato.",
+    error: "Errore: \n",
+    settingsTitle: "Impostazioni",
+    themeBtn: "Cambia tema",
+    closeBtn: "Chiudi",
+    checkAppUpdate: "Cerca aggiornamenti app",
+    downloadUpdate: "Scarica aggiornamento",
+    checking: "Controllo in corso...",
+    updateAvailable: "Nuova versione disponibile!",
+    upToDate: "Hai l'ultima versione.",
   },
 };
 
@@ -107,6 +209,11 @@ function applyLanguage(lang) {
   if (currentState && dict[currentState]) {
     outputElement.textContent = dict[currentState];
   }
+
+  const updateState = appUpdateStatus.getAttribute("data-state");
+  if (updateState && dict[updateState]) {
+    appUpdateStatus.textContent = dict[updateState];
+  }
 }
 
 function updateOutput(stateKey, appendText = "") {
@@ -161,6 +268,7 @@ let newUpdateUrl = null;
 
 async function checkAppUpdates(silent = false) {
   if (!silent) {
+    appUpdateStatus.setAttribute("data-state", "checking");
     appUpdateStatus.textContent = (
       translations[currentLang] || translations["en"]
     ).checking;
@@ -176,9 +284,13 @@ async function checkAppUpdates(silent = false) {
 
     if (data.tag_name && data.tag_name !== currentVersion) {
       newUpdateUrl = data.html_url;
+
+      appUpdateStatus.setAttribute("data-state", "updateAvailable");
       appUpdateStatus.textContent = (
         translations[currentLang] || translations["en"]
       ).updateAvailable;
+
+      checkUpdateBtn.setAttribute("data-i18n", "downloadUpdate");
       checkUpdateBtn.textContent = (
         translations[currentLang] || translations["en"]
       ).downloadUpdate;
@@ -188,15 +300,18 @@ async function checkAppUpdates(silent = false) {
         await invoke("open_link", { url: newUpdateUrl });
       };
     } else if (!silent) {
+      appUpdateStatus.setAttribute("data-state", "upToDate");
       appUpdateStatus.textContent = (
         translations[currentLang] || translations["en"]
       ).upToDate;
     }
   } catch (err) {
-    if (!silent)
+    if (!silent) {
+      appUpdateStatus.setAttribute("data-state", "error");
       appUpdateStatus.textContent = (
         translations[currentLang] || translations["en"]
       ).error;
+    }
   } finally {
     if (!silent) checkUpdateBtn.disabled = false;
   }

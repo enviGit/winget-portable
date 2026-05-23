@@ -4,7 +4,7 @@ on:
     tags:
       - "v*"
 jobs:
-  build-and-release:
+  build_release:
     runs-on: windows-latest
     steps:
       - name: Checkout repository
@@ -31,3 +31,6 @@ jobs:
           releaseBody: "Automatic portable version."
           releaseDraft: false
           prerelease: false
+          includeBundle: false
+          includeRelease: true
+          args: --no-bundle
