@@ -27,7 +27,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tagName: app-v__VERSION__
-          releaseName: "WinUp v__VERSION__"
-          releaseBody: "Automatyczna wersja portable."
+          releaseName: "Winget v__VERSION__"
+          releaseBody: "Automatic portable version."
           releaseDraft: false
           prerelease: false

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="system">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,12 +7,7 @@
         <link rel="stylesheet" href="styles.css" />
     </head>
     <body>
-        <div class="top-bar">
-            <select id="langSelect">
-                <option value="en">English</option>
-                <option value="pl">Polski</option>
-            </select>
-        </div>
+        <button id="openSettingsBtn" class="icon-btn">⚙️</button>
 
         <div class="container">
             <h1 data-i18n="title">Update Apps</h1>
@@ -25,12 +20,6 @@
                 <button id="scanBtn" data-i18n="scanBtn">
                     Scan for updates
                 </button>
-                <label class="checkbox-container">
-                    <input type="checkbox" id="autoAccept" checked />
-                    <span data-i18n="autoAccept"
-                        >Automatically accept all agreements</span
-                    >
-                </label>
             </div>
 
             <div id="tableContainer" class="hidden">
@@ -62,6 +51,65 @@
 Ready to go...</pre
             >
         </div>
+
+        <div id="settingsOverlay" class="overlay hidden">
+            <div class="settings-panel">
+                <h2 data-i18n="settingsTitle">Settings</h2>
+
+                <div class="setting-item">
+                    <select id="langSelect">
+                        <option value="en">🇺🇸 English</option>
+                        <option value="pl">🇵🇱 Polski</option>
+                        <option value="es">🇪🇸 Español</option>
+                        <option value="de">🇩🇪 Deutsch</option>
+                        <option value="fr">🇫🇷 Français</option>
+                        <option value="it">🇮🇹 Italiano</option>
+                    </select>
+                </div>
+
+                <div class="setting-item switch-item">
+                    <span data-i18n="autoAccept"
+                        >Automatically accept all agreements</span
+                    >
+                    <label class="switch">
+                        <input type="checkbox" id="autoAccept" checked />
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-item switch-item">
+                    <span data-i18n="startupCheck"
+                        >Check updates on startup</span
+                    >
+                    <label class="switch">
+                        <input type="checkbox" id="startupCheck" checked />
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-item theme-section">
+                    <button id="themeToggleBtn" data-i18n="themeBtn">
+                        Toggle Theme
+                    </button>
+                </div>
+
+                <div class="setting-item update-section">
+                    <button id="checkUpdateBtn" data-i18n="checkAppUpdate">
+                        Check for app updates
+                    </button>
+                    <span id="appUpdateStatus" class="update-status"></span>
+                </div>
+
+                <button
+                    id="closeSettingsBtn"
+                    data-i18n="closeBtn"
+                    class="close-btn"
+                >
+                    Close
+                </button>
+            </div>
+        </div>
+
         <script type="module" src="main.js"></script>
     </body>
 </html>

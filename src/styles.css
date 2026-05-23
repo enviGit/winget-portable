@@ -1,5 +1,4 @@
 :root {
-    color-scheme: light dark;
     --bg-color: #f8f9fa;
     --surface-color: #ffffff;
     --text-color: #212529;
@@ -8,10 +7,12 @@
     --border-color: #e9ecef;
     --row-hover: #f1f3f5;
     --console-bg: #e9ecef;
+    --overlay-bg: rgba(0, 0, 0, 0.5);
 }
 
-@media (prefers-color-scheme: dark) {
-    :root {
+[data-theme="dark"],
+html[data-theme="system"] {
+    @media (prefers-color-scheme: dark) {
         --bg-color: #0f1115;
         --surface-color: #1a1d24;
         --text-color: #f8f9fa;
@@ -20,7 +21,32 @@
         --border-color: #2b303b;
         --row-hover: #22262f;
         --console-bg: #0a0a0c;
+        --overlay-bg: rgba(0, 0, 0, 0.8);
     }
+}
+
+[data-theme="dark"] {
+    --bg-color: #0f1115;
+    --surface-color: #1a1d24;
+    --text-color: #f8f9fa;
+    --accent-color: #6366f1;
+    --accent-hover: #818cf8;
+    --border-color: #2b303b;
+    --row-hover: #22262f;
+    --console-bg: #0a0a0c;
+    --overlay-bg: rgba(0, 0, 0, 0.8);
+}
+
+[data-theme="light"] {
+    --bg-color: #f8f9fa;
+    --surface-color: #ffffff;
+    --text-color: #212529;
+    --accent-color: #4f46e5;
+    --accent-hover: #4338ca;
+    --border-color: #e9ecef;
+    --row-hover: #f1f3f5;
+    --console-bg: #e9ecef;
+    --overlay-bg: rgba(0, 0, 0, 0.5);
 }
 
 body {
@@ -30,6 +56,21 @@ body {
     margin: 0;
     padding: 0;
     overflow-y: scroll;
+    transition:
+        background-color 0.4s ease,
+        color 0.4s ease;
+}
+
+table,
+th,
+td,
+pre,
+.settings-panel,
+select {
+    transition:
+        background-color 0.4s ease,
+        border-color 0.4s ease,
+        color 0.4s ease;
 }
 
 ::-webkit-scrollbar {
@@ -47,32 +88,28 @@ body {
     background: var(--accent-color);
 }
 
-.top-bar {
-    display: flex;
-    justify-content: flex-end;
-    padding: 15px 25px;
-}
-
-select {
-    background-color: var(--surface-color);
+.icon-btn {
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    background: transparent;
+    font-size: 24px;
+    padding: 5px;
+    border: none;
+    box-shadow: none;
     color: var(--text-color);
-    border: 1px solid var(--border-color);
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-family: inherit;
     cursor: pointer;
-    outline: none;
-    transition: border-color 0.2s ease;
+    z-index: 100;
 }
-
-select:focus {
-    border-color: var(--accent-color);
+.icon-btn:hover {
+    background: transparent;
+    transform: scale(1.1);
 }
 
 .container {
     max-width: 900px;
     margin: 0 auto;
-    padding: 0 25px 30px;
+    padding: 40px 25px 30px;
 }
 
 h1 {
@@ -106,10 +143,6 @@ button:hover {
     transform: translateY(-1px);
 }
 
-button:active {
-    transform: translateY(1px);
-}
-
 button:disabled {
     opacity: 0.6;
     cursor: not-allowed;
@@ -125,7 +158,73 @@ button:disabled {
 }
 
 .hidden {
-    display: none !important;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--overlay-bg);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    transition:
+        opacity 0.3s ease,
+        visibility 0.3s ease;
+}
+
+.settings-panel {
+    background-color: var(--surface-color);
+    padding: 30px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    transform: translateY(0);
+    transition:
+        transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+        background-color 0.4s ease;
+}
+
+.overlay.hidden .settings-panel {
+    transform: translateY(20px);
+}
+
+.setting-item {
+    margin-bottom: 20px;
+}
+
+select {
+    width: 100%;
+    background-color: var(--console-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 15px;
+    cursor: pointer;
+    outline: none;
+}
+
+.close-btn {
+    width: 100%;
+    margin-top: 10px;
+    background-color: transparent;
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+.close-btn:hover {
+    background-color: var(--border-color);
+    color: var(--text-color);
 }
 
 .table-wrapper {
@@ -151,26 +250,9 @@ td {
     border-bottom: 1px solid var(--border-color);
 }
 
-th {
-    background-color: rgba(0, 0, 0, 0.02);
-    font-weight: 600;
-    white-space: nowrap;
-}
-
-@media (prefers-color-scheme: dark) {
-    th {
-        background-color: rgba(255, 255, 255, 0.02);
-    }
-}
-
 tr {
     animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     opacity: 0;
-    transition: background-color 0.15s ease;
-}
-
-tr:hover {
-    background-color: var(--row-hover);
 }
 
 @keyframes slideIn {
@@ -194,12 +276,75 @@ pre {
     font-family: "Consolas", monospace;
     font-size: 13px;
     white-space: pre-wrap;
-    line-height: 1.5;
 }
 
-@media (max-width: 600px) {
-    .actions {
-        flex-direction: column;
-        align-items: flex-start;
-    }
+.switch-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    font-weight: 500;
+    font-size: 15px;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+    flex-shrink: 0;
+    margin-left: 15px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--border-color);
+    transition: 0.3s;
+    border-radius: 24px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+input:checked + .slider {
+    background-color: var(--accent-color);
+}
+
+input:checked + .slider:before {
+    transform: translateX(20px);
+}
+
+.theme-section,
+.update-section {
+    margin-top: 25px;
+}
+
+.update-status {
+    display: block;
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--accent-color);
+    font-weight: 600;
+    text-align: center;
 }

@@ -1,7 +1,20 @@
-# Tauri + Vanilla
+# Winget Portable Updater
 
-This template should help get you started developing with Tauri in vanilla HTML, CSS and Javascript.
+A lightweight, portable Windows application that scans and updates your software using the system's built-in Winget package manager. Built with Tauri and Vanilla JS for maximum performance.
 
-## Recommended IDE Setup
+## Features
+* **Portable:** Runs as a single `.exe` file with no installation required.
+* **Admin Ready:** Automatically requests the necessary administrator privileges on launch.
+* **Smart Scanning:** Fetches a list of available updates before making any changes.
+* **Auto-Accept:** Bypasses tedious source and package agreements silently.
+* **Modern UI:** Matches system themes including full Dark Mode support.
+* **Multilingual:** Supports English and Polish out of the box.
 
-- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+## Download
+Grab the latest `.exe` file from the [Releases](../../releases) tab.
+
+## Development
+This project uses Tauri. To run it locally:
+1. Install Node.js and Rust.
+2. Run `npm install` to get frontend dependencies.
+3. Run `npm run tauri dev` to start the development server.

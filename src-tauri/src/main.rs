@@ -58,9 +58,27 @@ fn update_app(id: String, auto_accept: bool) -> String {
     }
 }
 
+#[tauri::command]
+fn open_link(url: String) {
+    #[cfg(target_os = "windows")]
+    {
+        let _ = std::process::Command::new("cmd")
+            .args(["/C", "start", &url])
+            .spawn();
+    }
+    #[cfg(not(target_os = "windows"))]
+    {
+        let _ = std::process::Command::new("open").arg(&url).spawn();
+    }
+}
+
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![scan_updates, update_app])
+        .invoke_handler(tauri::generate_handler![
+            scan_updates,
+            update_app,
+            open_link
+        ])
         .run(tauri::generate_context!())
         .expect("Failed to run app");
 }
