@@ -16,7 +16,7 @@ struct CommandResponse {
 }
 
 #[tauri::command]
-fn scan_updates() -> String {
+async fn scan_updates() -> String {
     #[cfg(target_os = "windows")]
     {
         let output = std::process::Command::new("cmd")
@@ -55,7 +55,7 @@ fn scan_updates() -> String {
 
 #[tauri::command]
 #[allow(unused_variables)]
-fn update_app(id: String, auto_accept: bool) -> CommandResponse {
+async fn update_app(id: String, auto_accept: bool) -> CommandResponse {
     #[cfg(target_os = "windows")]
     {
         let mut args = vec!["/C", "chcp", "65001", ">nul", "&", "winget", "upgrade"];
@@ -90,7 +90,7 @@ fn update_app(id: String, auto_accept: bool) -> CommandResponse {
                     success: result.status.success(),
                     text,
                 }
-            },
+            }
             Err(e) => CommandResponse {
                 success: false,
                 text: e.to_string(),

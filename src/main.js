@@ -361,5 +361,4 @@ updateSelectedBtn.addEventListener("click", async () => {
 
   updateSelectedBtn.disabled = false;
   scanBtn.disabled = false;
-  scanBtn.click();
 });
