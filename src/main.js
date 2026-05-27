@@ -4,6 +4,7 @@ const { getVersion } = window.__TAURI__.app;
 
 const scanBtn = document.getElementById("scanBtn");
 const updateSelectedBtn = document.getElementById("updateSelectedBtn");
+const loadingBarContainer = document.getElementById("loadingBarContainer");
 const autoAcceptCheckbox = document.getElementById("autoAccept");
 const startupCheckCheckbox = document.getElementById("startupCheck");
 const outputElement = document.getElementById("output");
@@ -272,6 +273,7 @@ scanBtn.addEventListener("click", async () => {
   tableContainer.classList.add("hidden");
   tableBody.innerHTML = "";
   selectAllCheckbox.checked = true;
+  loadingBarContainer.classList.remove("hidden");
 
   try {
     const response = await invoke("scan_updates");
@@ -298,6 +300,7 @@ scanBtn.addEventListener("click", async () => {
   } catch (error) {
     updateOutput("error", error);
   } finally {
+    loadingBarContainer.classList.add("hidden");
     scanBtn.disabled = false;
   }
 });
@@ -319,6 +322,7 @@ updateSelectedBtn.addEventListener("click", async () => {
 
   outputElement.setAttribute("data-state", "updating");
   outputElement.textContent = dict.updating + "\n";
+  loadingBarContainer.classList.remove("hidden");
 
   for (let i = 0; i < selectedBoxes.length; i++) {
     const box = selectedBoxes[i];
@@ -359,6 +363,7 @@ updateSelectedBtn.addEventListener("click", async () => {
 
   await delay(2000);
 
+  loadingBarContainer.classList.add("hidden");
   updateSelectedBtn.disabled = false;
   scanBtn.disabled = false;
 });
