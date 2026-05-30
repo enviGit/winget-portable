@@ -1,48 +1,51 @@
-:root {
-    --bg-color: #f4f5f7;
-    --surface-color: #ffffff;
-    --text-color: #1f2328;
-    --text-muted: #656d76;
-    --accent-color: #4f46e5;
-    --accent-hover: #4338ca;
-    --border-color: #d0d7de;
-    --row-hover: #f3f4f6;
-    --console-bg: #f6f8fa;
-    --overlay-bg: rgba(0, 0, 0, 0.4);
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-    --shadow-lg:
-        0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
-}
+@supports (color: AccentColor) {
+    :root {
+        --bg-color: #f4f5f7;
+        --surface-color: #ffffff;
+        --text-color: #1f2328;
+        --text-muted: #656d76;
+        --accent-color: AccentColor;
+        --accent-hover: color-mix(in srgb, AccentColor 85%, #000000);
+        --border-color: #d0d7de;
+        --row-hover: #f3f4f6;
+        --console-bg: #f6f8fa;
+        --overlay-bg: rgba(0, 0, 0, 0.4);
+        --shadow-sm:
+            0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+        --shadow-lg:
+            0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+    }
 
-[data-theme="dark"] {
-    --bg-color: #0d1117;
-    --surface-color: #161b22;
-    --text-color: #e6edf3;
-    --text-muted: #8b949e;
-    --accent-color: #58a6ff;
-    --accent-hover: #3182ce;
-    --border-color: #30363d;
-    --row-hover: #1f242c;
-    --console-bg: #010409;
-    --overlay-bg: rgba(0, 0, 0, 0.7);
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
-    --shadow-lg: 0 14px 28px rgba(0, 0, 0, 0.7);
-}
-
-@media (prefers-color-scheme: dark) {
-    html[data-theme="system"] {
+    [data-theme="dark"] {
         --bg-color: #0d1117;
         --surface-color: #161b22;
         --text-color: #e6edf3;
         --text-muted: #8b949e;
-        --accent-color: #58a6ff;
-        --accent-hover: #3182ce;
+        --accent-color: AccentColor;
+        --accent-hover: color-mix(in srgb, AccentColor 85%, #ffffff);
         --border-color: #30363d;
         --row-hover: #1f242c;
         --console-bg: #010409;
         --overlay-bg: rgba(0, 0, 0, 0.7);
         --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
         --shadow-lg: 0 14px 28px rgba(0, 0, 0, 0.7);
+    }
+
+    @media (prefers-color-scheme: dark) {
+        html[data-theme="system"] {
+            --bg-color: #0d1117;
+            --surface-color: #161b22;
+            --text-color: #e6edf3;
+            --text-muted: #8b949e;
+            --accent-color: AccentColor;
+            --accent-hover: color-mix(in srgb, AccentColor 85%, #ffffff);
+            --border-color: #30363d;
+            --row-hover: #1f242c;
+            --console-bg: #010409;
+            --overlay-bg: rgba(0, 0, 0, 0.7);
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 14px 28px rgba(0, 0, 0, 0.7);
+        }
     }
 }
 
@@ -142,6 +145,68 @@ h1 {
     gap: 12px;
     margin: 5px 0 15px 0;
     flex-wrap: wrap;
+}
+
+.search-wrapper {
+    position: relative;
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.search-wrapper.hidden {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(20px);
+    pointer-events: none;
+}
+
+.search-wrapper input {
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: 8px 12px 8px 32px;
+    border-radius: 6px;
+    font-size: 13px;
+    outline: none;
+    width: 180px;
+    transition:
+        width 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+        border-color 0.2s;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.search-wrapper input:focus {
+    border-color: var(--accent-color);
+    width: 240px;
+}
+
+.search-icon {
+    position: absolute;
+    left: 10px;
+    width: 14px;
+    height: 14px;
+    color: var(--text-muted);
+}
+
+th.sortable {
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s;
+}
+
+th.sortable:hover {
+    background-color: var(--row-hover);
+    background-color: color-mix(in srgb, var(--row-hover) 50%, transparent);
+}
+
+.sort-icon {
+    display: inline-block;
+    margin-left: 4px;
+    font-size: 10px;
+    color: var(--text-muted);
+    transition: transform 0.2s;
 }
 
 button {
@@ -466,13 +531,14 @@ tbody tr:hover {
 }
 
 .console-wrapper.maximized {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    right: 15px;
-    bottom: 15px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
     z-index: 2000;
-    box-shadow: var(--shadow-lg);
+    border-radius: 0;
+    border: none;
 }
 
 .mac-header {

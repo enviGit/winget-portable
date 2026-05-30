@@ -4,6 +4,9 @@ const { getVersion } = window.__TAURI__.app;
 
 const scanBtn = document.getElementById("scanBtn");
 const updateSelectedBtn = document.getElementById("updateSelectedBtn");
+const searchInput = document.getElementById("searchInput");
+const searchWrapper = document.getElementById("searchWrapper");
+const nameHeader = document.getElementById("nameHeader");
 const loadingBarContainer = document.getElementById("loadingBarContainer");
 const autoAcceptCheckbox = document.getElementById("autoAccept");
 const startupCheckCheckbox = document.getElementById("startupCheck");
@@ -308,6 +311,7 @@ scanBtn.addEventListener("click", async () => {
       });
       tableContainer.classList.remove("hidden");
       updateSelectedBtn.classList.remove("hidden");
+      searchWrapper.classList.remove("hidden");
       updateOutput("ready");
       toggleUpdateBtnState();
     }
@@ -317,12 +321,6 @@ scanBtn.addEventListener("click", async () => {
     loadingBarContainer.classList.add("hidden");
     scanBtn.disabled = false;
   }
-});
-
-selectAllCheckbox.addEventListener("change", (e) => {
-  const checkboxes = document.querySelectorAll(".app-check");
-  checkboxes.forEach((box) => (box.checked = e.target.checked));
-  toggleUpdateBtnState();
 });
 
 updateSelectedBtn.addEventListener("click", async () => {
@@ -421,10 +419,72 @@ macMin.addEventListener("click", () => {
 });
 
 macMax.addEventListener("click", () => {
-  const isMaximized = consoleContainer.classList.toggle("maximized");
+  consoleContainer.classList.toggle("maximized");
+  consoleContainer.classList.remove("minimized");
 
-  if (isMaximized) {
-    consoleContainer.classList.remove("minimized");
-  }
+  window.dispatchEvent(new Event("resize"));
   autoScrollOutput();
+});
+
+searchInput.addEventListener("input", (e) => {
+  const term = e.target.value.toLowerCase();
+  const rows = tableBody.querySelectorAll("tr");
+
+  rows.forEach((row) => {
+    const name = row.cells[1].textContent.toLowerCase();
+    if (name.includes(term)) {
+      row.style.display = "";
+    } else {
+      row.style.display = "none";
+    }
+  });
+
+  updateSelectAllState();
+});
+
+function updateSelectAllState() {
+  const visibleRows = Array.from(tableBody.querySelectorAll("tr")).filter(
+    (r) => r.style.display !== "none",
+  );
+  const checkedVisible = visibleRows.filter(
+    (r) => r.querySelector(".app-check").checked,
+  );
+
+  if (visibleRows.length === 0) {
+    selectAllCheckbox.checked = false;
+  } else {
+    selectAllCheckbox.checked = visibleRows.length === checkedVisible.length;
+  }
+}
+
+selectAllCheckbox.addEventListener("change", (e) => {
+  const visibleRows = Array.from(tableBody.querySelectorAll("tr")).filter(
+    (r) => r.style.display !== "none",
+  );
+  visibleRows.forEach((row) => {
+    const box = row.querySelector(".app-check");
+    if (box) box.checked = e.target.checked;
+  });
+  toggleUpdateBtnState();
+});
+
+let sortAsc = true;
+nameHeader.addEventListener("click", () => {
+  const rows = Array.from(tableBody.querySelectorAll("tr"));
+
+  sortAsc = !sortAsc;
+
+  const sortIcon = nameHeader.querySelector(".sort-icon");
+  sortIcon.textContent = sortAsc ? "▲" : "▼";
+
+  rows.sort((a, b) => {
+    const nameA = a.cells[1].textContent.toLowerCase();
+    const nameB = b.cells[1].textContent.toLowerCase();
+
+    if (nameA < nameB) return sortAsc ? -1 : 1;
+    if (nameA > nameB) return sortAsc ? 1 : -1;
+    return 0;
+  });
+
+  rows.forEach((row) => tableBody.appendChild(row));
 });
