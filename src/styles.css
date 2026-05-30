@@ -1,3 +1,8 @@
+:root {
+    --accent-color: #4f46e5;
+    --accent-hover: #4338ca;
+}
+
 @supports (color: AccentColor) {
     :root {
         --bg-color: #f4f5f7;
