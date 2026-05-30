@@ -31,35 +31,44 @@
                 </button>
             </div>
 
-            <div id="tableContainer" class="hidden">
-                <div class="table-wrapper">
-                    <table id="appsTable">
-                        <thead>
-                            <tr>
-                                <th>
-                                    <input
-                                        type="checkbox"
-                                        id="selectAll"
-                                        checked
-                                    />
-                                </th>
-                                <th data-i18n="colName">Name</th>
-                                <th data-i18n="colCurrent">Current</th>
-                                <th data-i18n="colNew">New</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tableBody"></tbody>
-                    </table>
-                </div>
+            <div id="tableContainer" class="table-wrapper hidden">
+                <table id="appsTable">
+                    <thead>
+                        <tr>
+                            <th>
+                                <input type="checkbox" id="selectAll" checked />
+                            </th>
+                            <th data-i18n="colName">Name</th>
+                            <th data-i18n="colCurrent">Current</th>
+                            <th data-i18n="colNew">New</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
             </div>
 
             <div id="loadingBarContainer" class="hidden">
                 <div class="loading-bar"></div>
             </div>
 
-            <pre id="output" data-state="ready" data-i18n="ready">
-Ready to go...</pre
-            >
+            <div id="consoleContainer" class="console-wrapper">
+                <div class="mac-header">
+                    <div
+                        id="macClose"
+                        class="mac-btn mac-close"
+                        title="Clear console"
+                    >
+                        ✕
+                    </div>
+                    <div id="macMin" class="mac-btn mac-min" title="Minimize">
+                        −
+                    </div>
+                    <div id="macMax" class="mac-btn mac-max" title="Maximize">
+                        ＋
+                    </div>
+                </div>
+                <pre id="output" data-state="idle"></pre>
+            </div>
         </div>
 
         <div id="settingsOverlay" class="overlay hidden">

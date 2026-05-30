@@ -8,11 +8,14 @@ const loadingBarContainer = document.getElementById("loadingBarContainer");
 const autoAcceptCheckbox = document.getElementById("autoAccept");
 const startupCheckCheckbox = document.getElementById("startupCheck");
 const outputElement = document.getElementById("output");
+const consoleContainer = document.getElementById("consoleContainer");
+const macClose = document.getElementById("macClose");
+const macMin = document.getElementById("macMin");
+const macMax = document.getElementById("macMax");
 const langSelect = document.getElementById("langSelect");
 const tableContainer = document.getElementById("tableContainer");
 const tableBody = document.getElementById("tableBody");
 const selectAllCheckbox = document.getElementById("selectAll");
-
 const openSettingsBtn = document.getElementById("openSettingsBtn");
 const closeSettingsBtn = document.getElementById("closeSettingsBtn");
 const settingsOverlay = document.getElementById("settingsOverlay");
@@ -382,4 +385,46 @@ updateSelectedBtn.addEventListener("click", async () => {
   loadingBarContainer.classList.add("hidden");
   updateSelectedBtn.disabled = false;
   scanBtn.disabled = false;
+});
+
+document.addEventListener("mousedown", (e) => {
+  const btn = e.target.closest("button:not(:disabled)");
+  if (!btn) return;
+
+  const rect = btn.getBoundingClientRect();
+  const ripple = document.createElement("span");
+
+  ripple.classList.add("ripple");
+  ripple.style.left = `${e.clientX - rect.left}px`;
+  ripple.style.top = `${e.clientY - rect.top}px`;
+
+  btn.appendChild(ripple);
+
+  setTimeout(() => {
+    ripple.remove();
+  }, 600);
+});
+
+macClose.addEventListener("click", () => {
+  outputElement.textContent = "";
+  updateOutput("ready", "\n>_ Terminal cleared.");
+});
+
+macMin.addEventListener("click", () => {
+  consoleContainer.classList.remove("maximized");
+  consoleContainer.classList.toggle("minimized");
+
+  if (consoleContainer.classList.contains("minimized")) {
+    autoScrollOutput();
+    setTimeout(autoScrollOutput, 450);
+  }
+});
+
+macMax.addEventListener("click", () => {
+  const isMaximized = consoleContainer.classList.toggle("maximized");
+
+  if (isMaximized) {
+    consoleContainer.classList.remove("minimized");
+  }
+  autoScrollOutput();
 });
