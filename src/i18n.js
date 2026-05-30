@@ -25,7 +25,7 @@ window.translations = {
     upToDate: "You are on the latest version.",
     updateProgress: "Updating",
     done: "Done!",
-    finished: "Operations completed. Refreshing list...",
+    finished: "Operations completed.",
   },
   pl: {
     title: "Menedżer Aktualizacji",
@@ -53,7 +53,7 @@ window.translations = {
     upToDate: "Posiadasz najnowszą wersję.",
     updateProgress: "Aktualizacja",
     done: "Gotowe!",
-    finished: "Zakończono operacje. Odświeżam listę...",
+    finished: "Zakończono operacje.",
   },
   es: {
     title: "Actualizar Apps",
@@ -81,7 +81,7 @@ window.translations = {
     upToDate: "Tienes la última versión.",
     updateProgress: "Actualizando",
     done: "¡Hecho!",
-    finished: "Operaciones completadas. Actualizando lista...",
+    finished: "Operaciones completadas.",
   },
   de: {
     title: "Apps Aktualisieren",
@@ -109,7 +109,7 @@ window.translations = {
     upToDate: "Sie haben die neueste Version.",
     updateProgress: "Aktualisiere",
     done: "Erledigt!",
-    finished: "Vorgang abgeschlossen. Liste wird aktualisiert...",
+    finished: "Vorgang abgeschlossen.",
   },
   fr: {
     title: "Mettre à jour",
@@ -137,7 +137,7 @@ window.translations = {
     upToDate: "Vous avez la dernière version.",
     updateProgress: "Mise à jour",
     done: "Terminé!",
-    finished: "Opérations terminées. Actualisation de la liste...",
+    finished: "Opérations terminées.",
   },
   it: {
     title: "Aggiorna App",
@@ -165,6 +165,6 @@ window.translations = {
     upToDate: "Hai l'ultima versione.",
     updateProgress: "Aggiornamento",
     done: "Fatto!",
-    finished: "Operazioni completate. Aggiornamento lista...",
+    finished: "Operazioni completate.",
   },
 };

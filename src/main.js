@@ -48,6 +48,12 @@ startupCheckCheckbox.addEventListener("change", (e) => {
   localStorage.setItem("startupCheck", e.target.checked);
 });
 
+function autoScrollOutput() {
+  requestAnimationFrame(() => {
+    outputElement.scrollTop = outputElement.scrollHeight;
+  });
+}
+
 function applyLanguage(lang) {
   const dict = translations[lang] || translations["en"];
   document.querySelectorAll("[data-i18n]").forEach((el) => {
@@ -72,6 +78,7 @@ function updateOutput(stateKey, appendText = "") {
   const dict = translations[currentLang] || translations["en"];
   outputElement.setAttribute("data-state", stateKey);
   outputElement.textContent = dict[stateKey] + appendText;
+  autoScrollOutput();
 }
 
 function cleanWingetOutput(text) {
@@ -224,13 +231,15 @@ function parseWingetOutput(text) {
   let isTable = false;
 
   for (let line of lines) {
-    if (line.match(/^[-—]{3,}/)) {
+    const cleanLine = line.trim();
+
+    if (cleanLine.match(/^[-—]{3,}/)) {
       isTable = true;
       continue;
     }
-    if (!isTable || line.trim() === "") continue;
+    if (!isTable || cleanLine === "") continue;
 
-    const parts = line.trim().split(/\s+/);
+    const parts = cleanLine.split(/\s+/);
 
     if (parts.length >= 5) {
       const newVer = parts[parts.length - 2];
@@ -281,6 +290,7 @@ scanBtn.addEventListener("click", async () => {
 
     if (apps.length === 0) {
       updateOutput("noUpdates");
+      updateSelectedBtn.classList.add("hidden");
     } else {
       apps.forEach((app, index) => {
         const row = document.createElement("tr");
@@ -294,6 +304,7 @@ scanBtn.addEventListener("click", async () => {
         tableBody.appendChild(row);
       });
       tableContainer.classList.remove("hidden");
+      updateSelectedBtn.classList.remove("hidden");
       updateOutput("ready");
       toggleUpdateBtnState();
     }
@@ -323,6 +334,7 @@ updateSelectedBtn.addEventListener("click", async () => {
   outputElement.setAttribute("data-state", "updating");
   outputElement.textContent = dict.updating + "\n";
   loadingBarContainer.classList.remove("hidden");
+  autoScrollOutput();
 
   for (let i = 0; i < selectedBoxes.length; i++) {
     const box = selectedBoxes[i];
@@ -330,6 +342,7 @@ updateSelectedBtn.addEventListener("click", async () => {
     const appName = appRow.cells[1].textContent;
 
     outputElement.textContent += `\n[${i + 1}/${selectedBoxes.length}] ${dict.updateProgress}: ${appName}... `;
+    autoScrollOutput();
 
     await delay(50);
 
@@ -356,10 +369,13 @@ updateSelectedBtn.addEventListener("click", async () => {
       outputElement.textContent += `\n${dict.error} ${error}\n`;
     }
 
+    autoScrollOutput();
+
     await delay(50);
   }
 
   outputElement.textContent += `\n${dict.finished}`;
+  autoScrollOutput();
 
   await delay(2000);
 

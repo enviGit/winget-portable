@@ -49,7 +49,14 @@ async fn scan_updates() -> String {
 
     #[cfg(not(target_os = "windows"))]
     {
-        "Name                                     Id               Version          Available      Source\n------------------------------------------------------------------------------------------------------\nDiscord                                  Discord.Discord  1.0.0            1.2.0          winget\nSpotify                                  Spotify.Spotify  2.1.0            3.0.0          winget".to_string()
+        r#"Name                                     Id               Version          Available      Source
+    ------------------------------------------------------------------------------------------------------
+    Discord                                  Discord.Discord  1.0.0            1.2.0          winget
+    Spotify                                  Spotify.Spotify  2.1.0            3.0.0          winget
+    Google Chrome                            Google.Chrome    114.0.0          115.0.0        winget
+    Visual Studio Code                       Microsoft.VSCode 1.78.2           1.80.1         winget
+    Mozilla Firefox                          Mozilla.Firefox  112.0.1          115.0.2        winget
+    Slack                                    Slack.Slack      4.32.122         4.33.90        winget"#.to_string()
     }
 }
 
@@ -100,10 +107,15 @@ async fn update_app(id: String, auto_accept: bool) -> CommandResponse {
 
     #[cfg(not(target_os = "windows"))]
     {
+        std::thread::sleep(std::time::Duration::from_millis(2500));
+
         CommandResponse {
-            success: true,
-            text: format!("Mac OS simulation: Successfully updated {}.", id),
-        }
+                success: true,
+                text: format!(
+                    "Found {} [{}]\nThis application is licensed to you by its owner.\nSuccessfully verified installer hash\nStarting package install...\nSuccessfully installed",
+                    id, id
+                ),
+            }
     }
 }
 
