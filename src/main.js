@@ -32,6 +32,31 @@ let currentLang = localStorage.getItem("appLang") || "en";
 autoAcceptCheckbox.checked = localStorage.getItem("autoAccept") !== "false";
 startupCheckCheckbox.checked = localStorage.getItem("startupCheck") !== "false";
 
+const openBlacklistBtn = document.getElementById("openBlacklistBtn");
+const closeBlacklistBtn = document.getElementById("closeBlacklistBtn");
+const blacklistOverlay = document.getElementById("blacklistOverlay");
+const blacklistBody = document.getElementById("blacklistBody");
+const contextMenu = document.getElementById("contextMenu");
+const addToBlacklistBtn = document.getElementById("addToBlacklistBtn");
+const toast = document.getElementById("toast");
+let appToIgnore = null;
+let blacklist = JSON.parse(localStorage.getItem("winget_blacklist")) || [];
+
+function saveBlacklist() {
+  localStorage.setItem("winget_blacklist", JSON.stringify(blacklist));
+}
+
+let toastTimeout;
+function showToast(message) {
+  toast.innerHTML = `✅ ${message}`;
+  toast.classList.add("show");
+
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => {
+    toast.classList.remove("show");
+  }, 3000);
+}
+
 const sysLang = navigator.language.slice(0, 2);
 if (!localStorage.getItem("appLang") && translations[sysLang]) {
   currentLang = sysLang;
@@ -293,20 +318,48 @@ scanBtn.addEventListener("click", async () => {
   try {
     const response = await invoke("scan_updates");
     const apps = parseWingetOutput(response);
+    const visibleApps = apps.filter((app) => !blacklist.includes(app.name));
 
-    if (apps.length === 0) {
+    if (visibleApps.length === 0) {
       updateOutput("noUpdates");
       updateSelectedBtn.classList.add("hidden");
     } else {
-      apps.forEach((app, index) => {
+      visibleApps.forEach((app, index) => {
         const row = document.createElement("tr");
         row.style.animationDelay = `${index * 0.04}s`;
         row.innerHTML = `
-          <td><input type="checkbox" class="app-check" value="${app.id}" checked></td>
-          <td>${app.name}</td>
-          <td>${app.oldVer}</td>
-          <td>${app.newVer}</td>
-        `;
+                <td><input type="checkbox" class="app-check" value="${app.id}" checked></td>
+                <td>${app.name}</td>
+                <td>${app.oldVer}</td>
+                <td>${app.newVer}</td>
+                <td class="action-col">
+                    <button class="action-btn ignore-btn" title="Options">⋮</button>
+                </td>
+              `;
+
+        const ignoreBtn = row.querySelector(".ignore-btn");
+        ignoreBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+
+          if (
+            !contextMenu.classList.contains("hidden") &&
+            appToIgnore &&
+            appToIgnore.name === app.name
+          ) {
+            contextMenu.classList.add("hidden");
+            appToIgnore = null;
+            return;
+          }
+
+          appToIgnore = { name: app.name, row: row };
+
+          const rect = ignoreBtn.getBoundingClientRect();
+          contextMenu.style.top = `${rect.bottom + 5}px`;
+          contextMenu.style.left = `${rect.left - 130}px`;
+
+          contextMenu.classList.remove("hidden");
+        });
+
         tableBody.appendChild(row);
       });
       tableContainer.classList.remove("hidden");
@@ -487,4 +540,105 @@ nameHeader.addEventListener("click", () => {
   });
 
   rows.forEach((row) => tableBody.appendChild(row));
+});
+
+function renderBlacklist() {
+  if (!blacklistBody) return;
+
+  blacklist = JSON.parse(localStorage.getItem("winget_blacklist")) || [];
+
+  blacklistBody.innerHTML = "";
+
+  if (blacklist.length === 0) {
+    blacklistBody.innerHTML = `<tr><td style="text-align: center; color: var(--text-muted); padding: 20px;" colspan="2">List is empty</td></tr>`;
+    return;
+  }
+
+  blacklist.forEach((appName) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+            <td style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-right: 10px;" title="${appName}">
+                ${appName}
+            </td>
+            <td class="action-col" style="width: 40px; text-align: center;">
+                <button class="action-btn remove" title="Remove from blacklist">✕</button>
+            </td>
+        `;
+
+    tr.querySelector("button").addEventListener("click", () => {
+      blacklist = blacklist.filter((name) => name !== appName);
+      saveBlacklist();
+      renderBlacklist();
+    });
+
+    blacklistBody.appendChild(tr);
+  });
+}
+
+if (openBlacklistBtn) {
+  openBlacklistBtn.addEventListener("click", () => {
+    renderBlacklist();
+    blacklistOverlay.classList.remove("hidden");
+  });
+}
+
+if (closeBlacklistBtn) {
+  closeBlacklistBtn.addEventListener("click", () => {
+    blacklistOverlay.classList.add("hidden");
+  });
+}
+
+if (blacklistOverlay) {
+  blacklistOverlay.addEventListener("click", (e) => {
+    if (e.target === blacklistOverlay) {
+      blacklistOverlay.classList.add("hidden");
+    }
+  });
+}
+
+if (addToBlacklistBtn) {
+  addToBlacklistBtn.addEventListener("click", () => {
+    if (appToIgnore && !blacklist.includes(appToIgnore.name)) {
+      const rowToRemove = appToIgnore.row;
+      const nameToRemove = appToIgnore.name;
+
+      blacklist.push(nameToRemove);
+      saveBlacklist();
+
+      showToast(`${nameToRemove} added to ignored apps.`);
+
+      rowToRemove.style.transition = "opacity 0.3s ease";
+      rowToRemove.style.opacity = "0";
+
+      setTimeout(() => {
+        rowToRemove.remove();
+
+        const remainingRows = document.querySelectorAll("#tableBody tr").length;
+        if (remainingRows === 0) {
+          tableContainer.classList.add("hidden");
+          searchWrapper.classList.add("hidden");
+          updateSelectedBtn.classList.add("hidden");
+          updateOutput("noUpdates");
+        } else {
+          updateSelectAllState();
+          toggleUpdateBtnState();
+        }
+      }, 300);
+    }
+
+    contextMenu.classList.add("hidden");
+    appToIgnore = null;
+  });
+}
+
+document.addEventListener("click", (e) => {
+  if (contextMenu && !contextMenu.classList.contains("hidden")) {
+    if (
+      !e.target.closest(".context-menu") &&
+      !e.target.closest(".ignore-btn")
+    ) {
+      contextMenu.classList.add("hidden");
+      appToIgnore = null;
+    }
+  }
 });

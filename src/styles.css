@@ -722,3 +722,105 @@ input:focus-visible + .slider {
         left: -45%;
     }
 }
+
+.action-col {
+    width: 40px;
+    text-align: center;
+}
+
+.action-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.action-btn:hover {
+    background-color: var(--border-color);
+    color: var(--text-color);
+}
+
+.action-btn.remove {
+    color: #ff5f56;
+}
+
+.action-btn.remove:hover {
+    background-color: rgba(255, 95, 86, 0.1);
+    color: #e0443e;
+}
+
+.context-menu {
+    position: fixed;
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: var(--shadow-lg);
+    padding: 6px;
+    z-index: 2000;
+    min-width: 160px;
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    transition:
+        opacity 0.2s,
+        transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.context-menu.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(-10px) scale(0.95);
+}
+
+.context-menu button {
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    color: var(--text-color);
+    box-shadow: none;
+    border-radius: 4px;
+    padding: 10px 12px;
+    font-weight: 500;
+    font-size: 13px;
+    transition: background-color 0.15s;
+}
+
+.context-menu button:hover {
+    background-color: var(--row-hover);
+    color: #ff5f56;
+}
+
+.toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background-color: var(--surface-color);
+    color: var(--text-color);
+    padding: 12px 24px;
+    border-radius: 8px;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-color);
+    transition:
+        transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+        opacity 0.4s;
+    opacity: 0;
+    z-index: 9999;
+    font-weight: 600;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}

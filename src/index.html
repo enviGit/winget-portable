@@ -7,7 +7,9 @@
         <link rel="stylesheet" href="styles.css" />
     </head>
     <body>
-        <button id="openSettingsBtn" class="icon-btn">⚙️</button>
+        <button id="openSettingsBtn" class="icon-btn" title="Settings">
+            ⚙️
+        </button>
 
         <div class="container">
             <h1 data-i18n="title">Update Apps</h1>
@@ -64,6 +66,7 @@
                             </th>
                             <th data-i18n="colCurrent">Current</th>
                             <th data-i18n="colNew">New</th>
+                            <th class="action-col"></th>
                         </tr>
                     </thead>
                     <tbody id="tableBody"></tbody>
@@ -151,6 +154,53 @@
                 </button>
             </div>
         </div>
+
+        <button
+            id="openBlacklistBtn"
+            class="icon-btn"
+            style="right: 75px"
+            title="Manage Ignored Apps"
+        >
+            🚫
+        </button>
+
+        <div id="blacklistOverlay" class="overlay hidden">
+            <div class="settings-panel">
+                <h2>Ignored Apps</h2>
+                <p
+                    style="
+                        font-size: 13px;
+                        color: var(--text-muted);
+                        margin-top: 0;
+                    "
+                >
+                    These apps are hidden and will not be scanned for updates.
+                </p>
+
+                <div
+                    class="table-wrapper"
+                    style="flex: none; height: 250px; margin-bottom: 20px"
+                >
+                    <table
+                        style="
+                            width: 100%;
+                            table-layout: fixed;
+                            min-width: auto;
+                        "
+                    >
+                        <tbody id="blacklistBody"></tbody>
+                    </table>
+                </div>
+
+                <button id="closeBlacklistBtn" class="close-btn">Close</button>
+            </div>
+        </div>
+
+        <div id="contextMenu" class="context-menu hidden">
+            <button id="addToBlacklistBtn">🚫 Ignore this app</button>
+        </div>
+
+        <div id="toast" class="toast">App added to blacklist</div>
 
         <script src="./i18n.js"></script>
         <script src="./main.js"></script>
