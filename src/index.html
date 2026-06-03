@@ -200,6 +200,60 @@
             <button id="addToBlacklistBtn">🚫 Ignore this app</button>
         </div>
 
+        <button
+            id="openStatsBtn"
+            class="icon-btn"
+            style="right: 125px"
+            title="View Statistics"
+        >
+            📊
+        </button>
+
+        <div id="statsOverlay" class="overlay hidden">
+            <div class="settings-panel stats-panel" style="max-width: 500px">
+                <h2>Your Impact</h2>
+                <p
+                    style="
+                        font-size: 13px;
+                        color: var(--text-muted);
+                        margin-top: 0;
+                        margin-bottom: 20px;
+                    "
+                >
+                    See how much time Winget Portable has saved you.
+                </p>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="statTotalUpdates">0</div>
+                        <div class="stat-label">Total Packages</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statUniqueApps">0</div>
+                        <div class="stat-label">Unique Apps</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statMostUpdated">-</div>
+                        <div class="stat-label">Most Updated</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statDays">0</div>
+                        <div class="stat-label">Days Active</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statScans">0</div>
+                        <div class="stat-label">Total Scans</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statRuns">0</div>
+                        <div class="stat-label">App Runs</div>
+                    </div>
+                </div>
+
+                <button id="closeStatsBtn" class="close-btn">Close</button>
+            </div>
+        </div>
+
         <div id="toast" class="toast">App added to blacklist</div>
 
         <script src="./i18n.js"></script>

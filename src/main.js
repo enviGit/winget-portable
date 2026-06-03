@@ -41,6 +41,75 @@ const addToBlacklistBtn = document.getElementById("addToBlacklistBtn");
 const toast = document.getElementById("toast");
 let appToIgnore = null;
 let blacklist = JSON.parse(localStorage.getItem("winget_blacklist")) || [];
+const openStatsBtn = document.getElementById("openStatsBtn");
+const closeStatsBtn = document.getElementById("closeStatsBtn");
+const statsOverlay = document.getElementById("statsOverlay");
+
+let appStats = JSON.parse(localStorage.getItem("winget_stats")) || {
+  firstRunDate: Date.now(),
+  runs: 0,
+  scans: 0,
+  totalUpdates: 0,
+  appUpdateCounts: {},
+};
+
+function saveStats() {
+  localStorage.setItem("winget_stats", JSON.stringify(appStats));
+}
+appStats.runs += 1;
+saveStats();
+
+function renderStats() {
+  const daysActive = Math.floor(
+    (Date.now() - appStats.firstRunDate) / (1000 * 60 * 60 * 24),
+  );
+  const uniqueApps = Object.keys(appStats.appUpdateCounts).length;
+
+  let mostUpdatedApp = "-";
+  let maxUpdates = 0;
+  for (const [appName, count] of Object.entries(appStats.appUpdateCounts)) {
+    if (count > maxUpdates) {
+      maxUpdates = count;
+      mostUpdatedApp = appName;
+    }
+  }
+
+  document.getElementById("statTotalUpdates").textContent =
+    appStats.totalUpdates;
+  document.getElementById("statUniqueApps").textContent = uniqueApps;
+  document.getElementById("statDays").textContent = daysActive;
+  document.getElementById("statScans").textContent = appStats.scans;
+  document.getElementById("statRuns").textContent = appStats.runs;
+
+  const mostUpdatedEl = document.getElementById("statMostUpdated");
+  mostUpdatedEl.textContent = maxUpdates > 0 ? mostUpdatedApp : "-";
+  if (mostUpdatedApp.length > 12) {
+    mostUpdatedEl.style.fontSize = "16px";
+    mostUpdatedEl.style.marginTop = "10px";
+    mostUpdatedEl.style.marginBottom = "8px";
+  } else {
+    mostUpdatedEl.style.fontSize = "26px";
+    mostUpdatedEl.style.marginTop = "0";
+    mostUpdatedEl.style.marginBottom = "4px";
+  }
+}
+
+if (openStatsBtn) {
+  openStatsBtn.addEventListener("click", () => {
+    renderStats();
+    statsOverlay.classList.remove("hidden");
+  });
+}
+if (closeStatsBtn) {
+  closeStatsBtn.addEventListener("click", () => {
+    statsOverlay.classList.add("hidden");
+  });
+}
+if (statsOverlay) {
+  statsOverlay.addEventListener("click", (e) => {
+    if (e.target === statsOverlay) statsOverlay.classList.add("hidden");
+  });
+}
 
 function saveBlacklist() {
   localStorage.setItem("winget_blacklist", JSON.stringify(blacklist));
@@ -309,6 +378,8 @@ tableBody.addEventListener("change", (e) => {
 
 scanBtn.addEventListener("click", async () => {
   updateOutput("scanning");
+  appStats.scans += 1;
+  saveStats();
   scanBtn.disabled = true;
   tableContainer.classList.add("hidden");
   tableBody.innerHTML = "";
@@ -418,6 +489,13 @@ updateSelectedBtn.addEventListener("click", async () => {
         outputElement.textContent += `\n${dict.error} ${cleanResponse}\n`;
       } else {
         outputElement.textContent += `${dict.done}\n${cleanResponse}\n`;
+
+        appStats.totalUpdates += 1;
+        if (!appStats.appUpdateCounts[appName]) {
+          appStats.appUpdateCounts[appName] = 0;
+        }
+        appStats.appUpdateCounts[appName] += 1;
+        saveStats();
       }
     } catch (error) {
       outputElement.textContent += `\n${dict.error} ${error}\n`;
