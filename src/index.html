@@ -7,8 +7,45 @@
         <link rel="stylesheet" href="styles.css" />
     </head>
     <body>
-        <button id="openSettingsBtn" class="icon-btn" title="Settings">
-            ⚙️
+        <button
+            id="openSettingsBtn"
+            class="icon-btn"
+            style="right: 25px"
+            title="Settings"
+        >
+            <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            >
+                <circle cx="12" cy="12" r="3"></circle>
+                <path
+                    d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
+                ></path>
+            </svg>
+        </button>
+
+        <button
+            id="openDashboardBtn"
+            class="icon-btn"
+            style="right: 70px"
+            title="User Dashboard"
+        >
+            <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            >
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="3" y1="9" x2="21" y2="9"></line>
+                <line x1="9" y1="21" x2="9" y2="9"></line>
+            </svg>
         </button>
 
         <div class="container">
@@ -122,24 +159,63 @@
                     </label>
                 </div>
 
-                <div class="setting-item switch-item">
-                    <span data-i18n="startupCheck"
-                        >Check updates on startup</span
-                    >
-                    <label class="switch">
-                        <input type="checkbox" id="startupCheck" checked />
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
                 <div class="setting-item theme-section">
                     <button id="themeToggleBtn" data-i18n="themeBtn">
                         Toggle Theme
                     </button>
                 </div>
 
+                <div class="setting-item switch-item">
+                    <span data-i18n="accentColor">Accent Color</span>
+                    <div style="display: flex; align-items: center; gap: 10px">
+                        <input
+                            type="color"
+                            id="accentColorPicker"
+                            value="#4f46e5"
+                            style="
+                                border: none;
+                                padding: 0;
+                                width: 24px;
+                                height: 24px;
+                                cursor: pointer;
+                                background: transparent;
+                            "
+                        />
+                        <button
+                            id="resetAccentBtn"
+                            class="action-btn"
+                            title="Reset to default"
+                            style="padding: 2px 6px"
+                        >
+                            ↺
+                        </button>
+                    </div>
+                </div>
+
+                <div class="setting-item switch-item">
+                    <span data-i18n="reduceMotion">Reduce Motion</span>
+                    <label class="switch">
+                        <input type="checkbox" id="reduceMotionCheck" />
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
                 <div class="setting-item update-section">
-                    <button id="checkUpdateBtn" data-i18n="checkAppUpdate">
+                    <div class="switch-item" style="margin-bottom: 15px">
+                        <span data-i18n="startupCheck"
+                            >Check updates on startup</span
+                        >
+                        <label class="switch">
+                            <input type="checkbox" id="startupCheck" checked />
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <button
+                        id="checkUpdateBtn"
+                        data-i18n="checkAppUpdate"
+                        style="width: 100%"
+                    >
                         Check for app updates
                     </button>
                     <span id="appUpdateStatus" class="update-status"></span>
@@ -155,102 +231,115 @@
             </div>
         </div>
 
-        <button
-            id="openBlacklistBtn"
-            class="icon-btn"
-            style="right: 75px"
-            title="Manage Ignored Apps"
-        >
-            🚫
-        </button>
-
-        <div id="blacklistOverlay" class="overlay hidden">
-            <div class="settings-panel">
-                <h2>Ignored Apps</h2>
-                <p
-                    style="
-                        font-size: 13px;
-                        color: var(--text-muted);
-                        margin-top: 0;
-                    "
-                >
-                    These apps are hidden and will not be scanned for updates.
-                </p>
-
-                <div
-                    class="table-wrapper"
-                    style="flex: none; height: 250px; margin-bottom: 20px"
-                >
-                    <table
-                        style="
-                            width: 100%;
-                            table-layout: fixed;
-                            min-width: auto;
-                        "
-                    >
-                        <tbody id="blacklistBody"></tbody>
-                    </table>
-                </div>
-
-                <button id="closeBlacklistBtn" class="close-btn">Close</button>
-            </div>
-        </div>
-
         <div id="contextMenu" class="context-menu hidden">
             <button id="addToBlacklistBtn">🚫 Ignore this app</button>
         </div>
 
-        <button
-            id="openStatsBtn"
-            class="icon-btn"
-            style="right: 125px"
-            title="View Statistics"
-        >
-            📊
-        </button>
+        <div id="dashboardOverlay" class="overlay hidden">
+            <div
+                class="settings-panel dashboard-panel"
+                style="
+                    max-width: 550px;
+                    padding: 25px;
+                    height: 520px;
+                    display: flex;
+                    flex-direction: column;
+                "
+            >
+                <div class="tabs-header">
+                    <button class="tab-btn active" data-target="tab-stats">
+                        Your Impact
+                    </button>
+                    <button class="tab-btn" data-target="tab-blacklist">
+                        Ignored Apps
+                    </button>
+                </div>
 
-        <div id="statsOverlay" class="overlay hidden">
-            <div class="settings-panel stats-panel" style="max-width: 500px">
-                <h2>Your Impact</h2>
-                <p
-                    style="
-                        font-size: 13px;
-                        color: var(--text-muted);
-                        margin-top: 0;
-                        margin-bottom: 20px;
-                    "
-                >
-                    See how much time Winget Portable has saved you.
-                </p>
-
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-value" id="statTotalUpdates">0</div>
-                        <div class="stat-label">Total Packages</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="statUniqueApps">0</div>
-                        <div class="stat-label">Unique Apps</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="statMostUpdated">-</div>
-                        <div class="stat-label">Most Updated</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="statDays">0</div>
-                        <div class="stat-label">Days Active</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="statScans">0</div>
-                        <div class="stat-label">Total Scans</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="statRuns">0</div>
-                        <div class="stat-label">App Runs</div>
+                <div id="tab-stats" class="tab-content active">
+                    <p
+                        style="
+                            font-size: 13px;
+                            color: var(--text-muted);
+                            margin: 0 0 20px 0;
+                        "
+                    >
+                        See how much time Winget Portable has saved you since
+                        first launch.
+                    </p>
+                    <div class="stats-grid" style="margin-bottom: auto">
+                        <div class="stat-card">
+                            <div class="stat-value" id="statTotalUpdates">
+                                0
+                            </div>
+                            <div class="stat-label">Total Packages</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="statUniqueApps">0</div>
+                            <div class="stat-label">Unique Apps</div>
+                        </div>
+                        <div class="stat-card">
+                            <div
+                                class="stat-value"
+                                id="statMostUpdated"
+                                style="
+                                    overflow: hidden;
+                                    text-overflow: ellipsis;
+                                    white-space: nowrap;
+                                "
+                            >
+                                -
+                            </div>
+                            <div class="stat-label">Most Updated</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="statDays">0</div>
+                            <div class="stat-label">Days Active</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="statScans">0</div>
+                            <div class="stat-label">Total Scans</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="statRuns">0</div>
+                            <div class="stat-label">App Runs</div>
+                        </div>
                     </div>
                 </div>
 
-                <button id="closeStatsBtn" class="close-btn">Close</button>
+                <div id="tab-blacklist" class="tab-content">
+                    <p
+                        style="
+                            font-size: 13px;
+                            color: var(--text-muted);
+                            margin: 0 0 15px 0;
+                        "
+                    >
+                        These apps are hidden and will not be scanned for
+                        updates.
+                    </p>
+                    <div
+                        class="table-wrapper"
+                        style="flex: 1; min-height: 0; margin-bottom: auto"
+                    >
+                        <table
+                            style="
+                                width: 100%;
+                                table-layout: fixed;
+                                min-width: auto;
+                            "
+                        >
+                            <tbody id="blacklistBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <button
+                    id="closeDashboardBtn"
+                    class="close-btn"
+                    style="margin-top: 20px"
+                >
+                    Close
+                </button>
             </div>
         </div>
 
