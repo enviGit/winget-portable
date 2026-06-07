@@ -56,6 +56,8 @@ const openSettingsBtn = document.getElementById("openSettingsBtn");
 const closeSettingsBtn = document.getElementById("closeSettingsBtn");
 const settingsOverlay = document.getElementById("settingsOverlay");
 const langSelect = document.getElementById("langSelect");
+const trigger = langSelect.querySelector(".select-trigger");
+const options = langSelect.querySelector(".select-options");
 const autoAcceptCheckbox = document.getElementById("autoAccept");
 const startupCheckCheckbox = document.getElementById("startupCheck");
 const reduceMotionCheck = document.getElementById("reduceMotionCheck");
@@ -574,11 +576,27 @@ selectAllCheckbox.addEventListener("change", (e) => {
 });
 
 // Settings & Config Toggles
-langSelect.addEventListener("change", (e) => {
-  currentLang = e.target.value;
-  localStorage.setItem("appLang", currentLang);
-  applyLanguage(currentLang);
-  toggleUpdateBtnState();
+trigger.addEventListener("click", () => {
+  options.classList.toggle("hidden");
+});
+
+options.querySelectorAll("li").forEach((li) => {
+  li.addEventListener("click", () => {
+    const value = li.getAttribute("data-value");
+    const text = li.textContent;
+    trigger.textContent = text;
+    options.classList.add("hidden");
+    currentLang = value;
+    localStorage.setItem("appLang", currentLang);
+    applyLanguage(currentLang);
+    toggleUpdateBtnState();
+  });
+});
+
+document.addEventListener("click", (e) => {
+  if (!langSelect.contains(e.target)) {
+    options.classList.add("hidden");
+  }
 });
 
 autoAcceptCheckbox.addEventListener("change", (e) => {
@@ -607,11 +625,7 @@ if (reduceMotionCheck) {
   reduceMotionCheck.addEventListener("change", (e) => {
     const reduced = e.target.checked;
     localStorage.setItem("winget_reduceMotion", reduced);
-    if (reduced) {
-      document.body.classList.add("reduce-motion");
-    } else {
-      document.body.classList.remove("reduce-motion");
-    }
+    document.documentElement.classList.toggle("reduce-motion");
   });
 }
 
@@ -646,13 +660,11 @@ themeToggleBtn.addEventListener("click", () => {
     currentTheme = isSystemDark ? "dark" : "light";
   }
 
-  if (currentTheme === "light") {
-    htmlEl.setAttribute("data-theme", "dark");
-    getCurrentWindow().setTheme("dark");
-  } else {
-    htmlEl.setAttribute("data-theme", "light");
-    getCurrentWindow().setTheme("light");
-  }
+  const newTheme = currentTheme === "light" ? "dark" : "light";
+
+  htmlEl.setAttribute("data-theme", newTheme);
+  getCurrentWindow().setTheme(newTheme);
+  localStorage.setItem("winget_theme", newTheme);
 
   setTimeout(() => {
     isThemeToggling = false;
@@ -855,16 +867,23 @@ document.addEventListener("mousedown", (e) => {
 // 6. INITIALIZATION
 // ==========================================================================
 // Check system language
-const sysLang = navigator.language.slice(0, 2);
-if (!localStorage.getItem("appLang") && translations[sysLang]) {
-  currentLang = sysLang;
-}
+const initialLangOption = options.querySelector(
+  `li[data-value="${currentLang}"]`,
+);
+if (initialLangOption) trigger.textContent = initialLangOption.textContent;
 
 // Apply saved settings
-langSelect.value = currentLang;
 applyLanguage(currentLang);
 autoAcceptCheckbox.checked = localStorage.getItem("autoAccept") !== "false";
 startupCheckCheckbox.checked = localStorage.getItem("startupCheck") !== "false";
+
+const savedTheme = localStorage.getItem("winget_theme");
+if (savedTheme) {
+  document.documentElement.setAttribute("data-theme", savedTheme);
+  getCurrentWindow().setTheme(savedTheme);
+} else {
+  document.documentElement.setAttribute("data-theme", "system");
+}
 
 if (includeUnknownCheckbox) {
   includeUnknownCheckbox.checked =
@@ -880,7 +899,7 @@ if (accentColorPicker) accentColorPicker.value = savedAccent;
 
 // Apply reduce motion
 if (isReduceMotion) {
-  document.body.classList.add("reduce-motion");
+  document.documentElement.classList.add("reduce-motion");
   if (reduceMotionCheck) reduceMotionCheck.checked = true;
 }
 
