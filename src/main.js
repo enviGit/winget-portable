@@ -64,6 +64,8 @@ const accentColorPicker = document.getElementById("accentColorPicker");
 const resetAccentBtn = document.getElementById("resetAccentBtn");
 const checkUpdateBtn = document.getElementById("checkUpdateBtn");
 const appUpdateStatus = document.getElementById("appUpdateStatus");
+const includeUnknown = document.getElementById("includeUnknownCheckbox");
+const includePinnedCheckbox = document.getElementById("includePinnedCheckbox");
 
 // Dashboard & Tabs
 const openDashboardBtn = document.getElementById("openDashboardBtn");
@@ -358,7 +360,12 @@ scanBtn.addEventListener("click", async () => {
   loadingBarContainer.classList.remove("hidden");
 
   try {
-    const response = await invoke("scan_updates");
+    const isUnknownChecked = includeUnknownCheckbox
+      ? includeUnknownCheckbox.checked
+      : false;
+    const response = await invoke("scan_updates", {
+      includeUnknown: isUnknownChecked,
+    });
     const apps = parseWingetOutput(response);
     const visibleApps = apps.filter((app) => !blacklist.includes(app.name));
 
@@ -439,9 +446,14 @@ updateSelectedBtn.addEventListener("click", async () => {
     await delay(50);
 
     try {
+      const isUnknownChecked = includeUnknownCheckbox
+        ? includeUnknownCheckbox.checked
+        : false;
       const response = await invoke("update_app", {
         id: box.value,
         autoAccept: isAutoAccept,
+        includeUnknown: isUnknownChecked,
+        uninstallPrevious: true,
       });
       const cleanResponse = cleanWingetOutput(response.text);
       const lowerResp = cleanResponse.toLowerCase();

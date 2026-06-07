@@ -16,20 +16,27 @@ struct CommandResponse {
 }
 
 #[tauri::command]
-async fn scan_updates() -> String {
+#[allow(unused_variables)]
+async fn scan_updates(include_unknown: bool) -> String {
     #[cfg(target_os = "windows")]
     {
+        let mut args = vec![
+            "/C",
+            "chcp",
+            "65001",
+            ">nul",
+            "&",
+            "winget",
+            "upgrade",
+            "--accept-source-agreements",
+        ];
+
+        if include_unknown {
+            args.push("--include-unknown");
+        }
+
         let output = std::process::Command::new("cmd")
-            .args([
-                "/C",
-                "chcp",
-                "65001",
-                ">nul",
-                "&",
-                "winget",
-                "upgrade",
-                "--accept-source-agreements",
-            ])
+            .args(args)
             .env("WINGET_DISABLE_INTERACTIVITY", "1")
             .creation_flags(CREATE_NO_WINDOW)
             .output();
@@ -49,20 +56,25 @@ async fn scan_updates() -> String {
 
     #[cfg(not(target_os = "windows"))]
     {
-        r#"Name                                     Id               Version          Available      Source
-    ------------------------------------------------------------------------------------------------------
-    Discord                                  Discord.Discord  1.0.0            1.2.0          winget
-    Spotify                                  Spotify.Spotify  2.1.0            3.0.0          winget
-    Google Chrome                            Google.Chrome    114.0.0          115.0.0        winget
-    Visual Studio Code                       Microsoft.VSCode 1.78.2           1.80.1         winget
-    Mozilla Firefox                          Mozilla.Firefox  112.0.1          115.0.2        winget
-    Slack                                    Slack.Slack      4.32.122         4.33.90        winget"#.to_string()
+        r#"Name                                     Id               Version         Available      Source
+        ------------------------------------------------------------------------------------------------------
+        Discord                                  Discord.Discord  1.0.0            1.2.0          winget
+        Spotify                                  Spotify.Spotify  2.1.0            3.0.0          winget
+        Google Chrome                            Google.Chrome    114.0.0          115.0.0        winget
+        Visual Studio Code                       Microsoft.VSCode 1.78.2           1.80.1         winget
+        Mozilla Firefox                          Mozilla.Firefox  112.0.1          115.0.2        winget
+        Slack                                    Slack.Slack      4.32.122         4.33.90        winget"#.to_string()
     }
 }
 
 #[tauri::command]
 #[allow(unused_variables)]
-async fn update_app(id: String, auto_accept: bool) -> CommandResponse {
+async fn update_app(
+    id: String,
+    auto_accept: bool,
+    include_unknown: bool,
+    uninstall_previous: bool,
+) -> CommandResponse {
     #[cfg(target_os = "windows")]
     {
         let mut args = vec!["/C", "chcp", "65001", ">nul", "&", "winget", "upgrade"];
@@ -79,6 +91,14 @@ async fn update_app(id: String, auto_accept: bool) -> CommandResponse {
             args.push("--accept-source-agreements");
             args.push("--accept-package-agreements");
             args.push("--silent");
+        }
+
+        if include_unknown {
+            args.push("--include-unknown");
+        }
+
+        if uninstall_previous {
+            args.push("--uninstall-previous");
         }
 
         let output = std::process::Command::new("cmd")

@@ -159,7 +159,42 @@
                     </label>
                 </div>
 
-                <div class="setting-item theme-section">
+                <div class="setting-item switch-item">
+                    <span data-i18n="includeUnknown"
+                        >Include unknown versions</span
+                    >
+                    <label class="switch">
+                        <input
+                            type="checkbox"
+                            id="includeUnknownCheckbox"
+                            checked
+                        />
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-item switch-item">
+                    <span data-i18n="includePinned"
+                        >Include pinned packages</span
+                    >
+                    <label class="switch">
+                        <input type="checkbox" id="includePinnedCheckbox" />
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <hr
+                    style="
+                        border: 0;
+                        border-top: 1px solid var(--border-color);
+                        margin: 15px 0;
+                    "
+                />
+
+                <div
+                    class="setting-item theme-section"
+                    style="margin-top: 0; border-top: none; padding-top: 0"
+                >
                     <button id="themeToggleBtn" data-i18n="themeBtn">
                         Toggle Theme
                     </button>
@@ -203,7 +238,7 @@
                 <div class="setting-item update-section">
                     <div class="switch-item" style="margin-bottom: 15px">
                         <span data-i18n="startupCheck"
-                            >Check updates on startup</span
+                            >Check for app updates on startup</span
                         >
                         <label class="switch">
                             <input type="checkbox" id="startupCheck" checked />

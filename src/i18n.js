@@ -26,6 +26,8 @@ window.translations = {
     updateProgress: "Updating",
     done: "Done!",
     finished: "Operations completed.",
+    includeUnknown: "Include unknown versions",
+    includePinned: "Include pinned packages",
   },
   pl: {
     title: "Menedżer Aktualizacji",
@@ -54,6 +56,8 @@ window.translations = {
     updateProgress: "Aktualizacja",
     done: "Gotowe!",
     finished: "Zakończono operacje.",
+    includeUnknown: "Zaktualizuj nieznane wersje",
+    includePinned: "Aktualizuj przypięte paczki",
   },
   es: {
     title: "Actualizar Apps",
@@ -82,6 +86,8 @@ window.translations = {
     updateProgress: "Actualizando",
     done: "¡Hecho!",
     finished: "Operaciones completadas.",
+    includeUnknown: "Incluir versiones desconocidas",
+    includePinned: "Incluir paquetes anclados",
   },
   de: {
     title: "Apps Aktualisieren",
@@ -110,6 +116,8 @@ window.translations = {
     updateProgress: "Aktualisiere",
     done: "Erledigt!",
     finished: "Vorgang abgeschlossen.",
+    includeUnknown: "Unbekannte Versionen einbeziehen",
+    includePinned: "Angeheftete Pakete einbeziehen",
   },
   fr: {
     title: "Mettre à jour",
@@ -138,6 +146,8 @@ window.translations = {
     updateProgress: "Mise à jour",
     done: "Terminé!",
     finished: "Opérations terminées.",
+    includeUnknown: "Inclure les versions inconnues",
+    includePinned: "Inclure les paquets épinglés",
   },
   it: {
     title: "Aggiorna App",
@@ -166,5 +176,7 @@ window.translations = {
     updateProgress: "Aggiornamento",
     done: "Fatto!",
     finished: "Operazioni completate.",
+    includeUnknown: "Includi versioni sconosciute",
+    includePinned: "Includi pacchetti bloccati",
   },
 };
