@@ -436,6 +436,9 @@ html[data-theme="system"] select {
 }
 
 .close-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 100%;
     margin-top: 15px;
     background-color: var(--row-hover);
@@ -823,6 +826,10 @@ input:focus-visible + .slider {
 
 .context-menu button:hover {
     background-color: var(--row-hover);
+    color: var(--accent-color);
+}
+
+.context-menu button#addToBlacklistBtn:hover {
     color: #ff5f56;
 }
 
@@ -957,4 +964,38 @@ button.tab-btn.active {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+.info-icon {
+    display: inline-flex;
+    justify-content: center;
+    color: var(--text-muted);
+    margin-left: 8px;
+    cursor: help;
+    transition: color 0.2s ease;
+}
+
+.info-icon:hover {
+    color: var(--accent-color);
+}
+
+.info-icon svg {
+    width: 14px;
+    height: 14px;
+}
+
+.name-cell {
+    position: relative;
+    padding-right: 25px !important;
+    white-space: nowrap;
+}
+
+.pin-icon-container {
+    display: inline-flex;
+    color: var(--accent-color);
+    margin-left: 8px;
+}
+
+.pin-icon-container svg {
+    display: block;
 }

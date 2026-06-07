@@ -64,7 +64,9 @@ const accentColorPicker = document.getElementById("accentColorPicker");
 const resetAccentBtn = document.getElementById("resetAccentBtn");
 const checkUpdateBtn = document.getElementById("checkUpdateBtn");
 const appUpdateStatus = document.getElementById("appUpdateStatus");
-const includeUnknown = document.getElementById("includeUnknownCheckbox");
+const includeUnknownCheckbox = document.getElementById(
+  "includeUnknownCheckbox",
+);
 const includePinnedCheckbox = document.getElementById("includePinnedCheckbox");
 
 // Dashboard & Tabs
@@ -138,6 +140,24 @@ function isNewerVersion(remote, local) {
   return false;
 }
 
+function renderRow(app, index, isPinned) {
+  const row = document.createElement("tr");
+  row.style.animationDelay = `${index * 0.04}s`;
+  row.innerHTML = `
+          <td><input type="checkbox" class="app-check" value="${app.id}" checked></td>
+          <td class="name-cell" style="position: relative; padding-right: 25px;">
+              ${app.name}
+              <span class="pin-icon-container" title="Pinned" style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); color: var(--accent-color); display: ${isPinned ? "inline-flex" : "none"};">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><path d="M21 2v6h-6"></path><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+              </span>
+          </td>
+          <td>${app.oldVer}</td>
+          <td>${app.newVer}</td>
+          <td class="action-col"><button class="action-btn ignore-btn">⋮</button></td>
+      `;
+  return row;
+}
+
 // ==========================================================================
 // 4. UI & STATE MANAGEMENT
 // ==========================================================================
@@ -165,9 +185,15 @@ function updateOutput(stateKey, appendText = "") {
 
 function applyLanguage(lang) {
   const dict = translations[lang] || translations["en"];
+
   document.querySelectorAll("[data-i18n]").forEach((el) => {
     const key = el.getAttribute("data-i18n");
     if (dict[key]) el.textContent = dict[key];
+  });
+
+  document.querySelectorAll("[data-i18n-title]").forEach((el) => {
+    const key = el.getAttribute("data-i18n-title");
+    if (dict[key]) el.setAttribute("title", dict[key]);
   });
 
   const currentState = outputElement.getAttribute("data-state");
@@ -288,6 +314,21 @@ function renderBlacklist() {
   });
 }
 
+function updatePinIcon(cell, id, isPinned) {
+  const existing = cell.querySelector(".pin-icon-container");
+  if (isPinned) {
+    if (!existing) {
+      const span = document.createElement("span");
+      span.className = "pin-icon-container";
+      span.title = "App is pinned";
+      span.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><path d="M21 2v6h-6"></path><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>`;
+      cell.appendChild(span);
+    }
+  } else {
+    if (existing) existing.remove();
+  }
+}
+
 // ==========================================================================
 // 5. CORE BUSINESS LOGIC
 // ==========================================================================
@@ -349,23 +390,47 @@ async function checkAppUpdates(silent = false) {
   }
 }
 
+async function getPinnedIds() {
+  try {
+    const response = await invoke("get_pins");
+    return response
+      .split("\n")
+      .filter(
+        (line) =>
+          line.includes(".") &&
+          !line.includes("---") &&
+          !line.startsWith("Name"),
+      )
+      .map((line) => {
+        const parts = line.trim().split(/\s+/);
+        return parts.find((part) => part.includes(".") && part.length > 3);
+      })
+      .filter((id) => id !== undefined);
+  } catch (e) {
+    console.error("Failed to get pins:", e);
+    return [];
+  }
+}
+
 scanBtn.addEventListener("click", async () => {
+  scanBtn.disabled = true;
+  updateSelectedBtn.disabled = true;
+  updateSelectedBtn.classList.add("hidden");
   updateOutput("scanning");
   appStats.scans += 1;
   saveStats();
-  scanBtn.disabled = true;
   tableContainer.classList.add("hidden");
   tableBody.innerHTML = "";
   selectAllCheckbox.checked = true;
   loadingBarContainer.classList.remove("hidden");
 
   try {
-    const isUnknownChecked = includeUnknownCheckbox
-      ? includeUnknownCheckbox.checked
-      : false;
+    const pinnedIds = await getPinnedIds();
     const response = await invoke("scan_updates", {
-      includeUnknown: isUnknownChecked,
+      includeUnknown: includeUnknownCheckbox?.checked || false,
+      includePinned: includePinnedCheckbox?.checked || false,
     });
+
     const apps = parseWingetOutput(response);
     const visibleApps = apps.filter((app) => !blacklist.includes(app.name));
 
@@ -374,37 +439,22 @@ scanBtn.addEventListener("click", async () => {
       updateSelectedBtn.classList.add("hidden");
     } else {
       visibleApps.forEach((app, index) => {
-        const row = document.createElement("tr");
-        row.style.animationDelay = `${index * 0.04}s`;
-        row.innerHTML = `
-          <td><input type="checkbox" class="app-check" value="${app.id}" checked></td>
-          <td>${app.name}</td>
-          <td>${app.oldVer}</td>
-          <td>${app.newVer}</td>
-          <td class="action-col">
-              <button class="action-btn ignore-btn" title="Options">⋮</button>
-          </td>
-        `;
+        const isPinned = pinnedIds.includes(app.id);
+        const row = renderRow(app, index, isPinned);
 
-        const ignoreBtn = row.querySelector(".ignore-btn");
-        ignoreBtn.addEventListener("click", (e) => {
+        row.querySelector(".ignore-btn").addEventListener("click", (e) => {
           e.stopPropagation();
-          if (
-            !contextMenu.classList.contains("hidden") &&
-            appToIgnore &&
-            appToIgnore.name === app.name
-          ) {
-            contextMenu.classList.add("hidden");
-            appToIgnore = null;
-            return;
-          }
-          appToIgnore = { name: app.name, row: row };
-          const rect = ignoreBtn.getBoundingClientRect();
+          appToIgnore = {
+            name: app.name,
+            row: row,
+            id: app.id,
+            isPinned: isPinned,
+          };
+          const rect = e.target.getBoundingClientRect();
           contextMenu.style.top = `${rect.bottom + 5}px`;
           contextMenu.style.left = `${rect.left - 130}px`;
           contextMenu.classList.remove("hidden");
         });
-
         tableBody.appendChild(row);
       });
 
@@ -419,6 +469,7 @@ scanBtn.addEventListener("click", async () => {
   } finally {
     loadingBarContainer.classList.add("hidden");
     scanBtn.disabled = false;
+    toggleUpdateBtnState();
   }
 });
 
@@ -429,6 +480,9 @@ updateSelectedBtn.addEventListener("click", async () => {
   updateSelectedBtn.disabled = true;
   scanBtn.disabled = true;
   const isAutoAccept = autoAcceptCheckbox.checked;
+  const isUnknownChecked = includeUnknownCheckbox?.checked || false;
+  const isPinnedChecked = includePinnedCheckbox?.checked || false;
+  const pinnedIds = await getPinnedIds();
   const dict = translations[currentLang] || translations["en"];
 
   outputElement.setAttribute("data-state", "updating");
@@ -438,22 +492,22 @@ updateSelectedBtn.addEventListener("click", async () => {
 
   for (let i = 0; i < selectedBoxes.length; i++) {
     const box = selectedBoxes[i];
+    const appId = box.value;
     const appRow = box.closest("tr");
-    const appName = appRow.cells[1].textContent;
+    const appName = appRow.cells[1].textContent.trim();
+    const isPinned = pinnedIds.includes(appId);
 
     outputElement.textContent += `\n[${i + 1}/${selectedBoxes.length}] ${dict.updateProgress}: ${appName}... `;
     autoScrollOutput();
     await delay(50);
 
     try {
-      const isUnknownChecked = includeUnknownCheckbox
-        ? includeUnknownCheckbox.checked
-        : false;
       const response = await invoke("update_app", {
-        id: box.value,
+        id: appId,
         autoAccept: isAutoAccept,
         includeUnknown: isUnknownChecked,
-        uninstallPrevious: true,
+        includePinned: isPinnedChecked,
+        uninstallPrevious: !isPinned,
       });
       const cleanResponse = cleanWingetOutput(response.text);
       const lowerResp = cleanResponse.toLowerCase();
@@ -487,6 +541,46 @@ updateSelectedBtn.addEventListener("click", async () => {
   updateSelectedBtn.disabled = false;
   scanBtn.disabled = false;
 });
+
+async function renderPinned() {
+  const pinnedBody = document.getElementById("pinnedBody");
+  pinnedBody.innerHTML = "<tr><td colspan='2'>Loading...</td></tr>";
+
+  try {
+    const response = await invoke("get_pins");
+    const lines = response.split("\n");
+    pinnedBody.innerHTML = "";
+
+    let isTable = false;
+    lines.forEach((line) => {
+      if (line.match(/^[-—]{3,}/)) {
+        isTable = true;
+        return;
+      }
+      if (!isTable || line.trim() === "" || line.startsWith("Name")) return;
+
+      const parts = line.trim().split(/\s+/);
+      const id = parts.find((p) => p.includes("."));
+
+      if (id) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${id}</td><td class="action-col"><button class="action-btn remove-pin">✕</button></td>`;
+
+        tr.querySelector(".remove-pin").addEventListener("click", async () => {
+          await invoke("unpin_app", { id: id });
+          renderPinned();
+        });
+        pinnedBody.appendChild(tr);
+      }
+    });
+
+    if (pinnedBody.innerHTML === "") {
+      pinnedBody.innerHTML = "<tr><td colspan='2'>No pinned apps</td></tr>";
+    }
+  } catch (e) {
+    pinnedBody.innerHTML = "<tr><td colspan='2'>Error</td></tr>";
+  }
+}
 
 // ==========================================================================
 // 6. EVENT LISTENERS
@@ -554,6 +648,18 @@ autoAcceptCheckbox.addEventListener("change", (e) => {
 startupCheckCheckbox.addEventListener("change", (e) => {
   localStorage.setItem("startupCheck", e.target.checked);
 });
+
+if (includeUnknownCheckbox) {
+  includeUnknownCheckbox.addEventListener("change", (e) => {
+    localStorage.setItem("winget_includeUnknown", e.target.checked);
+  });
+}
+
+if (includePinnedCheckbox) {
+  includePinnedCheckbox.addEventListener("change", (e) => {
+    localStorage.setItem("winget_includePinned", e.target.checked);
+  });
+}
 
 if (reduceMotionCheck) {
   reduceMotionCheck.addEventListener("change", (e) => {
@@ -659,7 +765,25 @@ tabButtons.forEach((btn) => {
   });
 });
 
-// Blacklist Context Menu
+document
+  .querySelector('[data-target="tab-pinned"]')
+  .addEventListener("click", renderPinned);
+
+// Context Menu Logic
+if (toggleKeepPreviousBtn) {
+  toggleKeepPreviousBtn.addEventListener("click", async () => {
+    if (appToIgnore) {
+      if (appToIgnore.isPinned) {
+        await invoke("unpin_app", { id: appToIgnore.id });
+      } else {
+        await invoke("pin_app", { id: appToIgnore.id });
+      }
+      contextMenu.classList.add("hidden");
+      scanBtn.click();
+    }
+  });
+}
+
 if (addToBlacklistBtn) {
   addToBlacklistBtn.addEventListener("click", () => {
     if (appToIgnore && !blacklist.includes(appToIgnore.name)) {
@@ -796,6 +920,16 @@ langSelect.value = currentLang;
 applyLanguage(currentLang);
 autoAcceptCheckbox.checked = localStorage.getItem("autoAccept") !== "false";
 startupCheckCheckbox.checked = localStorage.getItem("startupCheck") !== "false";
+
+if (includeUnknownCheckbox) {
+  includeUnknownCheckbox.checked =
+    localStorage.getItem("winget_includeUnknown") !== "false";
+}
+if (includePinnedCheckbox) {
+  includePinnedCheckbox.checked =
+    localStorage.getItem("winget_includePinned") === "true";
+}
+
 document.documentElement.style.setProperty("--accent-color", savedAccent);
 if (accentColorPicker) accentColorPicker.value = savedAccent;
 

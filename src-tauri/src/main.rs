@@ -17,7 +17,7 @@ struct CommandResponse {
 
 #[tauri::command]
 #[allow(unused_variables)]
-async fn scan_updates(include_unknown: bool) -> String {
+async fn scan_updates(include_unknown: bool, include_pinned: bool) -> String {
     #[cfg(target_os = "windows")]
     {
         let mut args = vec![
@@ -33,6 +33,10 @@ async fn scan_updates(include_unknown: bool) -> String {
 
         if include_unknown {
             args.push("--include-unknown");
+        }
+
+        if include_pinned {
+            args.push("--include-pinned");
         }
 
         let output = std::process::Command::new("cmd")
@@ -73,6 +77,7 @@ async fn update_app(
     id: String,
     auto_accept: bool,
     include_unknown: bool,
+    include_pinned: bool,
     uninstall_previous: bool,
 ) -> CommandResponse {
     #[cfg(target_os = "windows")]
@@ -95,6 +100,10 @@ async fn update_app(
 
         if include_unknown {
             args.push("--include-unknown");
+        }
+
+        if include_pinned {
+            args.push("--include-pinned");
         }
 
         if uninstall_previous {
@@ -140,6 +149,51 @@ async fn update_app(
 }
 
 #[tauri::command]
+async fn get_pins() -> String {
+    let output = std::process::Command::new("winget")
+        .args(["pin", "list"])
+        .output()
+        .unwrap_or_else(|_| std::process::Output {
+            status: std::process::ExitStatus::default(),
+            stdout: Vec::new(),
+            stderr: Vec::new(),
+        });
+    String::from_utf8_lossy(&output.stdout).to_string()
+}
+
+#[tauri::command]
+async fn pin_app(id: String) -> CommandResponse {
+    let output = std::process::Command::new("winget")
+        .args(["pin", "add", "--id", &id])
+        .output()
+        .unwrap_or_else(|_| std::process::Output {
+            status: std::process::ExitStatus::default(),
+            stdout: Vec::new(),
+            stderr: Vec::new(),
+        });
+    CommandResponse {
+        success: output.status.success(),
+        text: String::from_utf8_lossy(&output.stdout).to_string(),
+    }
+}
+
+#[tauri::command]
+async fn unpin_app(id: String) -> CommandResponse {
+    let output = std::process::Command::new("winget")
+        .args(["pin", "remove", "--id", &id])
+        .output()
+        .unwrap_or_else(|_| std::process::Output {
+            status: std::process::ExitStatus::default(),
+            stdout: Vec::new(),
+            stderr: Vec::new(),
+        });
+    CommandResponse {
+        success: output.status.success(),
+        text: String::from_utf8_lossy(&output.stdout).to_string(),
+    }
+}
+
+#[tauri::command]
 fn open_link(url: String) {
     #[cfg(target_os = "windows")]
     {
@@ -159,7 +213,10 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             scan_updates,
             update_app,
-            open_link
+            open_link,
+            get_pins,
+            pin_app,
+            unpin_app
         ])
         .run(tauri::generate_context!())
         .expect("Failed to run app");
