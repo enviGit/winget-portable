@@ -3,7 +3,7 @@
     --surface-color: #ffffff;
     --text-color: #1f2328;
     --text-muted: #656d76;
-    --accent-color: #4f46e5;
+    --accent-color: #4f87f8;
     --accent-hover: color-mix(in srgb, var(--accent-color) 85%, black);
     --border-color: #d0d7de;
     --row-hover: #f3f4f6;
@@ -444,6 +444,11 @@ html[data-theme="system"] select {
     background-color: var(--row-hover);
     color: var(--text-color);
     border: 1px solid var(--border-color);
+}
+.close-btn#closeDashboardBtn {
+    align-self: center;
+    max-width: 50%;
+    margin-top: 20px;
 }
 .close-btn:hover:not(:disabled) {
     background-color: var(--border-color);

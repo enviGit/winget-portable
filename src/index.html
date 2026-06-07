@@ -85,6 +85,7 @@
                     <input
                         type="text"
                         id="searchInput"
+                        data-i18n-placeholder="searchPlaceholder"
                         placeholder="Search apps..."
                     />
                 </div>
@@ -138,7 +139,9 @@
             <div class="settings-panel">
                 <h2 data-i18n="settingsTitle">Settings</h2>
 
-                <div class="setting-item">
+                <div class="setting-item switch-item">
+                    <span data-i18n="lang">Language</span>
+
                     <select id="langSelect">
                         <option value="en">English</option>
                         <option value="pl">Polski</option>
@@ -488,19 +491,32 @@
                 "
             >
                 <div class="tabs-header">
-                    <button class="tab-btn active" data-target="tab-stats">
+                    <button
+                        class="tab-btn active"
+                        data-target="tab-stats"
+                        data-i18n="tabStats"
+                    >
                         Your Impact
                     </button>
-                    <button class="tab-btn" data-target="tab-blacklist">
+                    <button
+                        class="tab-btn"
+                        data-target="tab-blacklist"
+                        data-i18n="tabIgnored"
+                    >
                         Ignored Apps
                     </button>
-                    <button class="tab-btn" data-target="tab-pinned">
+                    <button
+                        class="tab-btn"
+                        data-target="tab-pinned"
+                        data-i18n="tabPinned"
+                    >
                         Pinned Apps
                     </button>
                 </div>
 
                 <div id="tab-stats" class="tab-content active">
                     <p
+                        data-i18n="descStats"
                         style="
                             font-size: 13px;
                             color: var(--text-muted);
@@ -515,11 +531,18 @@
                             <div class="stat-value" id="statTotalUpdates">
                                 0
                             </div>
-                            <div class="stat-label">Total Packages</div>
+                            <div
+                                class="stat-label"
+                                data-i18n="statTotalPackages"
+                            >
+                                Total Packages
+                            </div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-value" id="statUniqueApps">0</div>
-                            <div class="stat-label">Unique Apps</div>
+                            <div class="stat-label" data-i18n="statUniqueApps">
+                                Unique Apps
+                            </div>
                         </div>
                         <div class="stat-card">
                             <div
@@ -533,25 +556,34 @@
                             >
                                 -
                             </div>
-                            <div class="stat-label">Most Updated</div>
+                            <div class="stat-label" data-i18n="statMostUpdated">
+                                Most Updated
+                            </div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-value" id="statDays">0</div>
-                            <div class="stat-label">Days Active</div>
+                            <div class="stat-label" data-i18n="statDaysActive">
+                                Days Active
+                            </div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-value" id="statScans">0</div>
-                            <div class="stat-label">Total Scans</div>
+                            <div class="stat-label" data-i18n="statTotalScans">
+                                Total Scans
+                            </div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-value" id="statRuns">0</div>
-                            <div class="stat-label">App Runs</div>
+                            <div class="stat-label" data-i18n="statAppRuns">
+                                App Runs
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <div id="tab-blacklist" class="tab-content">
                     <p
+                        data-i18n="descIgnored"
                         style="
                             font-size: 13px;
                             color: var(--text-muted);
@@ -579,6 +611,7 @@
 
                 <div id="tab-pinned" class="tab-content">
                     <p
+                        data-i18n="descPinned"
                         style="
                             font-size: 13px;
                             color: var(--text-muted);
@@ -599,8 +632,8 @@
 
                 <button
                     id="closeDashboardBtn"
+                    data-i18n="closeBtn"
                     class="close-btn"
-                    style="margin-top: 20px"
                 >
                     Close
                 </button>

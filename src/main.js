@@ -20,7 +20,7 @@ let isThemeToggling = false;
 let newUpdateUrl = null;
 let sortAsc = true;
 let toastTimeout;
-const defaultAccent = "#4f46e5";
+const defaultAccent = "#4f87f8";
 const savedAccent = localStorage.getItem("winget_accent") || defaultAccent;
 const isReduceMotion = localStorage.getItem("winget_reduceMotion") === "true";
 
@@ -119,6 +119,11 @@ function applyLanguage(lang) {
     if (dict[key]) el.setAttribute("title", dict[key]);
   });
 
+  document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
+    const key = el.getAttribute("data-i18n-placeholder");
+    if (dict[key]) el.setAttribute("placeholder", dict[key]);
+  });
+
   const currentState = outputElement.getAttribute("data-state");
   if (currentState && dict[currentState]) {
     outputElement.textContent = dict[currentState];
@@ -211,8 +216,10 @@ function renderBlacklist() {
   blacklist = JSON.parse(localStorage.getItem("winget_blacklist")) || [];
   blacklistBody.innerHTML = "";
 
+  const dict = translations[currentLang] || translations["en"];
+
   if (blacklist.length === 0) {
-    blacklistBody.innerHTML = `<tr><td style="text-align: center; color: var(--text-muted); padding: 20px;" colspan="2">List is empty</td></tr>`;
+    blacklistBody.innerHTML = `<tr><td style="text-align: center; color: var(--text-muted); padding: 20px;" colspan="2">${dict.listIsEmpty}</td></tr>`;
     return;
   }
 
@@ -223,7 +230,7 @@ function renderBlacklist() {
           ${appName}
       </td>
       <td class="action-col" style="width: 40px; text-align: center;">
-          <button class="action-btn remove" title="Remove from blacklist">✕</button>
+        <button class="action-btn remove" title="${dict.removeFromBlacklist}">✕</button>
       </td>
     `;
 
@@ -235,21 +242,6 @@ function renderBlacklist() {
 
     blacklistBody.appendChild(tr);
   });
-}
-
-function updatePinIcon(cell, id, isPinned) {
-  const existing = cell.querySelector(".pin-icon-container");
-  if (isPinned) {
-    if (!existing) {
-      const span = document.createElement("span");
-      span.className = "pin-icon-container";
-      span.title = "App is pinned";
-      span.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><path d="M21 2v6h-6"></path><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>`;
-      cell.appendChild(span);
-    }
-  } else {
-    if (existing) existing.remove();
-  }
 }
 
 // ==========================================================================
@@ -477,8 +469,9 @@ updateSelectedBtn.addEventListener("click", async () => {
 });
 
 async function renderPinned() {
+  const dict = translations[currentLang] || translations["en"];
   const pinnedBody = document.getElementById("pinnedBody");
-  pinnedBody.innerHTML = "<tr><td colspan='2'>Loading...</td></tr>";
+  pinnedBody.innerHTML = `<tr><td colspan='2' style='text-align: center;'>${dict.loadingPins}</td></tr>`;
 
   try {
     const response = await invoke("get_pins");
@@ -498,7 +491,7 @@ async function renderPinned() {
 
       if (id) {
         const tr = document.createElement("tr");
-        tr.innerHTML = `<td>${id}</td><td class="action-col"><button class="action-btn remove-pin">✕</button></td>`;
+        tr.innerHTML = `<td>${id}</td><td class="action-col"><button class="action-btn remove-pin" title="${dict.unpinTitle}">✕</button></td>`;
 
         tr.querySelector(".remove-pin").addEventListener("click", async () => {
           const btn = tr.querySelector(".remove-pin");
@@ -522,10 +515,10 @@ async function renderPinned() {
     });
 
     if (pinnedBody.innerHTML === "") {
-      pinnedBody.innerHTML = "<tr><td colspan='2'>No pinned apps</td></tr>";
+      pinnedBody.innerHTML = `<tr><td colspan='2' style='text-align: center;'>${dict.noPinnedApps}</td></tr>`;
     }
   } catch (e) {
-    pinnedBody.innerHTML = "<tr><td colspan='2'>Error</td></tr>";
+    pinnedBody.innerHTML = `<tr><td colspan='2' style='text-align: center;'>${dict.errorLoadingPins}</td></tr>`;
   }
 }
 
@@ -599,14 +592,14 @@ startupCheckCheckbox.addEventListener("change", (e) => {
 if (includeUnknownCheckbox) {
   includeUnknownCheckbox.addEventListener("change", (e) => {
     localStorage.setItem("winget_includeUnknown", e.target.checked);
-    if (!tableContainer.classList.contains("hidden")) scanBtn.click();
+    scanBtn.click();
   });
 }
 
 if (includePinnedCheckbox) {
   includePinnedCheckbox.addEventListener("change", (e) => {
     localStorage.setItem("winget_includePinned", e.target.checked);
-    if (!tableContainer.classList.contains("hidden")) scanBtn.click();
+    scanBtn.click();
   });
 }
 
@@ -739,10 +732,11 @@ if (addToBlacklistBtn) {
     if (appToIgnore && !blacklist.includes(appToIgnore.name)) {
       const rowToRemove = appToIgnore.row;
       const nameToRemove = appToIgnore.name;
+      const dict = translations[currentLang] || translations["en"];
 
       blacklist.push(nameToRemove);
       saveBlacklist();
-      showToast(`${nameToRemove} added to ignored apps.`);
+      showToast(`${nameToRemove} ${dict.addedToIgnored}`);
 
       rowToRemove.style.transition = "opacity 0.3s ease";
       rowToRemove.style.opacity = "0";
@@ -780,8 +774,9 @@ document.addEventListener("click", (e) => {
 
 // Console Controls
 macClose.addEventListener("click", () => {
+  const dict = translations[currentLang] || translations["en"];
   outputElement.textContent = "";
-  updateOutput("ready", "\n>_ Terminal cleared.");
+  updateOutput("ready", `\n${dict.terminalCleared}`);
 });
 
 macMin.addEventListener("click", () => {
