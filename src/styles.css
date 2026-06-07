@@ -131,6 +131,11 @@ html[data-theme="system"] ::-webkit-scrollbar-thumb:hover {
     background: rgba(139, 148, 158, 0.6);
 }
 
+.unselectable {
+    -webkit-user-select: none;
+    user-select: none;
+}
+
 .sun-icon {
     display: block;
 }

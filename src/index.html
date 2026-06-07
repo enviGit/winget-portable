@@ -86,8 +86,8 @@
         </button>
 
         <div class="container">
-            <h1 data-i18n="title">Update Apps</h1>
-            <p data-i18n="description">
+            <h1 class="unselectable" data-i18n="title">Update Apps</h1>
+            <p class="unselectable" data-i18n="description">
                 This tool will fetch and install the latest versions of your
                 installed software.
             </p>
@@ -174,9 +174,12 @@
 
         <div id="settingsOverlay" class="overlay hidden">
             <div class="settings-panel">
-                <h2 data-i18n="settingsTitle">Settings</h2>
+                <h2 class="unselectable" data-i18n="settingsTitle">Settings</h2>
 
-                <div class="section-label" data-i18n="sectionGeneral">
+                <div
+                    class="section-label unselectable"
+                    data-i18n="sectionGeneral"
+                >
                     GENERAL
                 </div>
                 <div class="setting-item switch-item">
@@ -195,7 +198,10 @@
                     </div>
                 </div>
 
-                <div class="section-label" data-i18n="sectionScanning">
+                <div
+                    class="section-label unselectable"
+                    data-i18n="sectionScanning"
+                >
                     SCANNING
                 </div>
                 <div class="setting-item switch-item">
@@ -292,7 +298,10 @@
                     </label>
                 </div>
 
-                <div class="section-label" data-i18n="sectionSystem">
+                <div
+                    class="section-label unselectable"
+                    data-i18n="sectionSystem"
+                >
                     SYSTEM
                 </div>
 
@@ -315,7 +324,7 @@
                         />
                         <button
                             id="resetAccentBtn"
-                            class="action-btn"
+                            class="action-btn unselectable"
                             title="Reset to default"
                             style="padding: 2px 6px"
                         >
@@ -526,21 +535,21 @@
             >
                 <div class="tabs-header">
                     <button
-                        class="tab-btn active"
+                        class="tab-btn active unselectable"
                         data-target="tab-stats"
                         data-i18n="tabStats"
                     >
                         Your Impact
                     </button>
                     <button
-                        class="tab-btn"
+                        class="tab-btn unselectable"
                         data-target="tab-blacklist"
                         data-i18n="tabIgnored"
                     >
                         Ignored Apps
                     </button>
                     <button
-                        class="tab-btn"
+                        class="tab-btn unselectable"
                         data-target="tab-pinned"
                         data-i18n="tabPinned"
                     >
@@ -550,6 +559,7 @@
 
                 <div id="tab-stats" class="tab-content active">
                     <p
+                        class="unselectable"
                         data-i18n="descStats"
                         style="
                             font-size: 13px;
@@ -566,7 +576,7 @@
                                 0
                             </div>
                             <div
-                                class="stat-label"
+                                class="stat-label unselectable"
                                 data-i18n="statTotalPackages"
                             >
                                 Total Packages
@@ -574,7 +584,10 @@
                         </div>
                         <div class="stat-card">
                             <div class="stat-value" id="statUniqueApps">0</div>
-                            <div class="stat-label" data-i18n="statUniqueApps">
+                            <div
+                                class="stat-label unselectable"
+                                data-i18n="statUniqueApps"
+                            >
                                 Unique Apps
                             </div>
                         </div>
@@ -590,25 +603,37 @@
                             >
                                 -
                             </div>
-                            <div class="stat-label" data-i18n="statMostUpdated">
+                            <div
+                                class="stat-label unselectable"
+                                data-i18n="statMostUpdated"
+                            >
                                 Most Updated
                             </div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-value" id="statDays">0</div>
-                            <div class="stat-label" data-i18n="statDaysActive">
+                            <div
+                                class="stat-label unselectable"
+                                data-i18n="statDaysActive"
+                            >
                                 Days Active
                             </div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-value" id="statScans">0</div>
-                            <div class="stat-label" data-i18n="statTotalScans">
+                            <div
+                                class="stat-label unselectable"
+                                data-i18n="statTotalScans"
+                            >
                                 Total Scans
                             </div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-value" id="statRuns">0</div>
-                            <div class="stat-label" data-i18n="statAppRuns">
+                            <div
+                                class="stat-label unselectable"
+                                data-i18n="statAppRuns"
+                            >
                                 App Runs
                             </div>
                         </div>
@@ -617,6 +642,7 @@
 
                 <div id="tab-blacklist" class="tab-content">
                     <p
+                        class="unselectable"
                         data-i18n="descIgnored"
                         style="
                             font-size: 13px;
@@ -645,6 +671,7 @@
 
                 <div id="tab-pinned" class="tab-content">
                     <p
+                        class="unselectable"
                         data-i18n="descPinned"
                         style="
                             font-size: 13px;
