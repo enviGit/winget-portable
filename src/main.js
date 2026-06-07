@@ -367,6 +367,17 @@ scanBtn.addEventListener("click", async () => {
 
         row.querySelector(".ignore-btn").addEventListener("click", (e) => {
           e.stopPropagation();
+
+          if (
+            !contextMenu.classList.contains("hidden") &&
+            appToIgnore &&
+            appToIgnore.id === app.id
+          ) {
+            contextMenu.classList.add("hidden");
+            appToIgnore = null;
+            return;
+          }
+
           appToIgnore = {
             name: app.name,
             row: row,
@@ -490,8 +501,21 @@ async function renderPinned() {
         tr.innerHTML = `<td>${id}</td><td class="action-col"><button class="action-btn remove-pin">✕</button></td>`;
 
         tr.querySelector(".remove-pin").addEventListener("click", async () => {
-          await invoke("unpin_app", { id: id });
-          renderPinned();
+          const btn = tr.querySelector(".remove-pin");
+          btn.disabled = true;
+          btn.textContent = "...";
+          try {
+            await invoke("unpin_app", { id: id });
+            renderPinned();
+
+            if (!tableContainer.classList.contains("hidden")) {
+              scanBtn.click();
+            }
+          } catch (err) {
+            console.error("Failed to unpin:", err);
+            btn.disabled = false;
+            btn.textContent = "✕";
+          }
         });
         pinnedBody.appendChild(tr);
       }
@@ -575,12 +599,14 @@ startupCheckCheckbox.addEventListener("change", (e) => {
 if (includeUnknownCheckbox) {
   includeUnknownCheckbox.addEventListener("change", (e) => {
     localStorage.setItem("winget_includeUnknown", e.target.checked);
+    if (!tableContainer.classList.contains("hidden")) scanBtn.click();
   });
 }
 
 if (includePinnedCheckbox) {
   includePinnedCheckbox.addEventListener("change", (e) => {
     localStorage.setItem("winget_includePinned", e.target.checked);
+    if (!tableContainer.classList.contains("hidden")) scanBtn.click();
   });
 }
 
@@ -702,6 +728,7 @@ if (toggleKeepPreviousBtn) {
         await invoke("pin_app", { id: appToIgnore.id });
       }
       contextMenu.classList.add("hidden");
+      renderPinned();
       scanBtn.click();
     }
   });
