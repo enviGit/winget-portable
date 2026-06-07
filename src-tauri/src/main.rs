@@ -150,27 +150,40 @@ async fn update_app(
 
 #[tauri::command]
 async fn get_pins() -> String {
-    let output = std::process::Command::new("winget")
-        .args(["pin", "list"])
-        .output()
-        .unwrap_or_else(|_| std::process::Output {
-            status: std::process::ExitStatus::default(),
-            stdout: Vec::new(),
-            stderr: Vec::new(),
-        });
+    #[cfg(target_os = "windows")]
+    use std::os::windows::process::CommandExt;
+
+    let mut cmd = std::process::Command::new("winget");
+    cmd.args(["pin", "list"]);
+
+    #[cfg(target_os = "windows")]
+    cmd.creation_flags(CREATE_NO_WINDOW);
+
+    let output = cmd.output().unwrap_or_else(|_| std::process::Output {
+        status: std::process::ExitStatus::default(),
+        stdout: Vec::new(),
+        stderr: Vec::new(),
+    });
     String::from_utf8_lossy(&output.stdout).to_string()
 }
 
 #[tauri::command]
 async fn pin_app(id: String) -> CommandResponse {
-    let output = std::process::Command::new("winget")
-        .args(["pin", "add", "--id", &id])
-        .output()
-        .unwrap_or_else(|_| std::process::Output {
-            status: std::process::ExitStatus::default(),
-            stdout: Vec::new(),
-            stderr: Vec::new(),
-        });
+    #[cfg(target_os = "windows")]
+    use std::os::windows::process::CommandExt;
+
+    let mut cmd = std::process::Command::new("winget");
+    cmd.args(["pin", "add", "--id", &id]);
+
+    #[cfg(target_os = "windows")]
+    cmd.creation_flags(CREATE_NO_WINDOW);
+
+    let output = cmd.output().unwrap_or_else(|_| std::process::Output {
+        status: std::process::ExitStatus::default(),
+        stdout: Vec::new(),
+        stderr: Vec::new(),
+    });
+
     CommandResponse {
         success: output.status.success(),
         text: String::from_utf8_lossy(&output.stdout).to_string(),
@@ -179,14 +192,21 @@ async fn pin_app(id: String) -> CommandResponse {
 
 #[tauri::command]
 async fn unpin_app(id: String) -> CommandResponse {
-    let output = std::process::Command::new("winget")
-        .args(["pin", "remove", "--id", &id])
-        .output()
-        .unwrap_or_else(|_| std::process::Output {
-            status: std::process::ExitStatus::default(),
-            stdout: Vec::new(),
-            stderr: Vec::new(),
-        });
+    #[cfg(target_os = "windows")]
+    use std::os::windows::process::CommandExt;
+
+    let mut cmd = std::process::Command::new("winget");
+    cmd.args(["pin", "remove", "--id", &id]);
+
+    #[cfg(target_os = "windows")]
+    cmd.creation_flags(CREATE_NO_WINDOW);
+
+    let output = cmd.output().unwrap_or_else(|_| std::process::Output {
+        status: std::process::ExitStatus::default(),
+        stdout: Vec::new(),
+        stderr: Vec::new(),
+    });
+
     CommandResponse {
         success: output.status.success(),
         text: String::from_utf8_lossy(&output.stdout).to_string(),
