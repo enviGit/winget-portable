@@ -1,6 +1,6 @@
 [package]
 name = "winget-portable"
-version = "1.5.1"
+version = "1.5.2"
 description = "A Tauri App"
 authors = ["Envi"]
 edition = "2021"

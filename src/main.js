@@ -792,15 +792,26 @@ macClose.addEventListener("click", () => {
 });
 
 macMin.addEventListener("click", () => {
-  consoleContainer.classList.remove("maximized");
-  consoleContainer.classList.toggle("minimized");
-  if (consoleContainer.classList.contains("minimized")) {
-    autoScrollOutput();
-    setTimeout(autoScrollOutput, 450);
+  if (isMaximized) {
+    macMax.click();
+
+    setTimeout(() => {
+      consoleContainer.classList.add("minimized");
+      autoScrollOutput();
+      setTimeout(autoScrollOutput, 450);
+    }, 420);
+  } else {
+    consoleContainer.classList.toggle("minimized");
+    if (consoleContainer.classList.contains("minimized")) {
+      autoScrollOutput();
+      setTimeout(autoScrollOutput, 450);
+    }
   }
 });
 
 macMax.addEventListener("click", () => {
+  consoleContainer.classList.remove("minimized");
+
   if (!isMaximized) {
     const rect = consoleContainer.getBoundingClientRect();
     consoleSpacer.style.height = `${rect.height}px`;
