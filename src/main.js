@@ -284,6 +284,7 @@ async function checkAppUpdates(silent = false) {
       checkUpdateBtn.textContent = (
         translations[currentLang] || translations["en"]
       ).downloadUpdate;
+      checkUpdateBtn.style.color = "#ffffff";
       checkUpdateBtn.style.backgroundColor = "var(--accent-color)";
       checkUpdateBtn.onclick = async () => {
         await invoke("open_link", { url: newUpdateUrl });
